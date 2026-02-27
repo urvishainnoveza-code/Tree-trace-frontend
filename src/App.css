@@ -1,0 +1,211 @@
+
+:root {
+  --primary-color: #2e7d32;
+  --secondary-color: #066a06;
+  --danger-color: #e53935;
+  --text-color: #263238;
+  --bg-light: #f5f5f5;
+  --header-height: 60px;
+  --footer-height: 40px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background-color: var(--bg-light);
+  color: var(--text-color);
+}
+
+/* === Layout === */
+.header {
+  height: var(--header-height);
+  background-color: var(--primary-color);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  justify-content: space-between;
+}
+
+.navbar {
+  height: 50px;
+  background-color: var(--secondary-color);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 20px;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
+}
+
+.main-content {
+  padding: 20px;
+  min-height: calc(100vh - var(--header-height) - var(--footer-height) - 50px);
+}
+
+.footer {
+  height: var(--footer-height);
+  background-color: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+/* === Utility Classes === */
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
+.btn-next {
+  height: 45px;
+  padding: 0 16px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  background-color: #6fae7a;
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.btn-next:hover {
+  background-color: #5f9252;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
+/* Full screen center layout */
+/* Full page center layout */
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f6f9;
+  padding: 20px;
+}
+
+/* Login Card */
+.login-card {
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
+  padding: 40px 35px;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+/* Title */
+.login-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+/* Input fields */
+.login-card .form-control {
+  height: 38px;
+  width: 400px;
+  border-radius: 8px;
+  border: 1px solid #dcdcdc;
+  font-size: 14px;
+  padding: 0 12px;
+  transition: all 0.2s ease;
+}
+
+.login-card .form-control:focus {
+  border-color: #198754; /* bootstrap success color */
+  box-shadow: 0 0 0 2px rgba(25, 135, 84, 0.1);
+}
+
+/* Main button */
+.login-card .btn-success {
+  height: 48px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 15px;
+  transition: 0.3s ease;
+}
+
+.login-card .btn-success:disabled {
+  opacity: 0.7;
+}
+
+/* Change Email link */
+.login-card .btn-link {
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.login-card .btn-link:hover {
+  text-decoration: underline;
+}
+
+/* Error message */
+.login-card .alert {
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+/* ===== User Profile Page ===== */
+.profile-card {
+  max-width: 900px;
+  margin: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.border-end {
+  border-right: 1px solid #ddd !important;
+}
+
+/* mobile */
+@media (max-width: 768px) {
+  .profile-card {
+    padding: 15px;
+  }
+}
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+}
+.left, .right {
+  width: 50%;
+}

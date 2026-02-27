@@ -1,0 +1,171 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Layout Wrapper */
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Header */
+.header {
+  height: 60px;
+  background: #37b258;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
+  flex-shrink: 0;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.logo-section img {
+  height: 35px;
+}
+
+.logout-btn {
+  background: white;
+  color: #37b258;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  background: #e5e7eb;
+}
+
+/* Body */
+.layout-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background: #1f2937;
+  padding: 20px 15px;
+  overflow-y: auto;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-link {
+  text-decoration: none;
+  color: #d1d5db;
+  padding: 10px 12px;
+  border-radius: 5px;
+  transition: 0.3s;
+  font-size: 14px;
+}
+
+.sidebar-link:hover {
+  background: #374151;
+  color: white;
+}
+
+.sidebar-link.active {
+  background: #37b258;
+  color: white;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  background: #f3f4f6;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+
+/* Layout Wrapper */
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Header (Fixed automatically because layout-wrapper uses column) */
+.header {
+  height: 60px;
+  background: #37b258;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
+  flex-shrink: 0;
+}
+
+/* Body Section */
+.layout-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden; /* Prevent body scroll */
+}
+
+/* Sidebar (Fixed) */
+.sidebar {
+  width: 240px;
+  background: #1f2937;
+  padding: 20px 15px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+/* Main Content Scrollable */
+.main-content {
+  flex: 1;
+  background: #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* THIS IS IMPORTANT */
+  padding: 25px;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+  flex: 1;
+}
+
+/* Footer (NOT fixed) */
+.footer {
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  padding: 15px;
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 20px;
+  min-width: 100%;
+}
