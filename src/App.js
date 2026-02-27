@@ -58,8 +58,8 @@ import {
 import MainLayout from "./components/layout/MainLayout";
 
 import Login from "./pages/Admin/Login/Login";
+import Otp from "./pages/Admin/Login/otp";
 import UserLogin from "./pages/User/UserLogin";
-import Register from "./pages/Admin/Login/Register";
 
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import ViewUser from "./pages/Admin/ManageUser/ViewUser";
@@ -95,8 +95,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} /> {/* Admin login */}
+        <Route path="/otp" element={<Otp />} /> {/* OTP verification */}
         <Route path="/user-login" element={<UserLogin />} />
-        <Route path="/register" element={<Register />} />
         <Route
           path="/admin-dashboard"
           element={
@@ -194,8 +194,22 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/user-profile/:id" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
-        <Route path="/tree-profile/:id" element={<ProtectedRoute><TreeProfile /></ProtectedRoute>} />
+        <Route
+          path="/user-profile/:id"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tree-profile/:id"
+          element={
+            <ProtectedRoute>
+              <TreeProfile />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/treename"
           element={
