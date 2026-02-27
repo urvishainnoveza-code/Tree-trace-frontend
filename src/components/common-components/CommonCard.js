@@ -10,5 +10,6 @@ const CommonCard = ({ title, icon, onClick }) => {
     </div>
   );
 };
+//kkjikuguyhtdgfszs
 
 export default CommonCard;
