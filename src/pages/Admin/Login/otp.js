@@ -7,6 +7,7 @@ import {
   toastError,
   toastInfo,
 } from "../../../utils/alertHelper";
+import "./Auth.css";
 
 function Otp() {
   const [otp, setOtp] = useState("");
@@ -68,51 +69,49 @@ function Otp() {
   };
 
   return (
-    <div className="container-fluid">
-      <div className="row justify-content-center align-items-center min-vh-100">
-        <div className="col-md-5">
-          <div className="card shadow-lg border-0">
-            <div className="card-body p-5">
-              <h2 className="text-center mb-2 fw-bold">Tree Trace</h2>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h2 className="auth-title">Tree Trace</h2>
+          <p className="auth-subtitle">Enter OTP to continue</p>
+        </div>
 
-              <form onSubmit={handleVerify}>
-                <div className="form-group mb-4">
-                  <label className="form-label fw-600">6-Digit OTP</label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    maxLength="6"
-                    value={otp}
-                    onChange={handleOtpChange}
-                    placeholder="000000"
-                    className="form-control form-control-user text-center"
-                    style={{ fontSize: "24px", letterSpacing: "8px" }}
-                    disabled={isSubmitting}
-                    autoFocus
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="btn btn-success btn-block w-100"
-                  disabled={isSubmitting || otp.length !== 6}
-                >
-                  {isSubmitting ? "Verifying..." : "Verify OTP"}
-                </button>
-
-                <div className="text-center mt-3">
-                  <button
-                    type="button"
-                    className="btn btn-link text-muted"
-                    onClick={() => navigate("/")}
-                    disabled={isSubmitting}
-                  >
-                    Back to Login
-                  </button>
-                </div>
-              </form>
+        <div className="auth-body">
+          <form onSubmit={handleVerify}>
+            <div className="auth-form-group">
+              <label className="auth-label">6-Digit OTP</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                maxLength="6"
+                value={otp}
+                onChange={handleOtpChange}
+                placeholder="000000"
+                className="auth-input auth-otp"
+                disabled={isSubmitting}
+                autoFocus
+              />
             </div>
-          </div>
+
+            <button
+              type="submit"
+              className="auth-btn-primary"
+              disabled={isSubmitting || otp.length !== 6}
+            >
+              {isSubmitting ? "Verifying..." : "Verify OTP"}
+            </button>
+
+            <div className="auth-divider-top auth-text-center">
+              <button
+                type="button"
+                className="auth-btn-link"
+                onClick={() => navigate("/")}
+                disabled={isSubmitting}
+              >
+                Back to Login
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

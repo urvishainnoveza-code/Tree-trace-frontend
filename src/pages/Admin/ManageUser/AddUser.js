@@ -44,9 +44,7 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess }) => {
   const fetchStates = async (countryId) => {
     if (!countryId) return;
     try {
-      const res = await axiosInstance.get(
-        `/states/country/${countryId}`
-      );
+      const res = await axiosInstance.get(`/states/country/${countryId}`);
       setStates(res.data.data || []);
     } catch (err) {
       console.error("State fetch error", err);
@@ -56,9 +54,7 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess }) => {
   const fetchCities = async (stateId) => {
     if (!stateId) return;
     try {
-      const res = await axiosInstance.get(
-        `/cities/state/${stateId}`
-      );
+      const res = await axiosInstance.get(`/cities/state/${stateId}`);
       setCities(res.data.data || []);
     } catch (err) {
       console.error("City fetch error", err);
@@ -68,9 +64,7 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess }) => {
   const fetchAreas = async (cityId) => {
     if (!cityId) return;
     try {
-      const res = await axiosInstance.get(
-        `/areas/city/${cityId}`
-      );
+      const res = await axiosInstance.get(`/areas/city/${cityId}`);
       setAreas(res.data.data || []);
     } catch (err) {
       console.error("Area fetch error", err);
@@ -115,7 +109,12 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess }) => {
       setError("");
 
       // Validate required fields
-      if (!values.firstName || !values.lastName || !values.email || !values.area) {
+      if (
+        !values.firstName ||
+        !values.lastName ||
+        !values.email ||
+        !values.area
+      ) {
         setError("Required fields: First Name, Last Name, Email, Area");
         setLoading(false);
         return;

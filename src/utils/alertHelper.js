@@ -46,7 +46,7 @@ export const confirmDelete = async (
     icon = 'question',
     confirmButtonText = 'OK',
     cancelButtonText = 'Cancel',
-    confirmButtonColor = '#3085d6',
+    confirmButtonColor = '#27ae60',
     cancelButtonColor = '#6c757d',
   } = options;
 

@@ -207,18 +207,16 @@ const CommonTable = ({
   title = "Table",
   columns = [],
   data = [],
+  actions = [], // NEW: Support actions array
   onAdd,
   onEdit,
   onDelete,
   onAssign,
   onView,
   addLabel = "+ Add",
+  rowKey = "_id", // NEW: Support custom row key
 }) => {
-
-  const safeData = useMemo(
-    () => (Array.isArray(data) ? data : []),
-    [data]
-  );
+  const safeData = useMemo(() => (Array.isArray(data) ? data : []), [data]);
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -226,18 +224,26 @@ const CommonTable = ({
   const totalPages = Math.max(1, Math.ceil(safeData.length / rowsPerPage));
 
   const paginated = useMemo(() => {
-    return safeData.slice(
-      (page - 1) * rowsPerPage,
-      page * rowsPerPage
-    );
+    return safeData.slice((page - 1) * rowsPerPage, page * rowsPerPage);
   }, [safeData, page, rowsPerPage]);
 
-  const hasActions = Boolean(onEdit || onDelete);
+  // Support both actions array and individual callbacks
+  const hasActions = Boolean(
+    actions.length || onEdit || onDelete || onAssign || onView,
+  );
+
+  // Helper function to get cell value - supports both accessor functions and key strings
+  const getCellValue = (row, column) => {
+    const accessor = column.accessor || column.key;
+    if (typeof accessor === "function") {
+      return accessor(row);
+    }
+    return row[accessor] ?? "-";
+  };
 
   return (
     <div className="card mb-4">
       <div className="card-body">
-
         {/* Header */}
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h4 className="mb-0">{title}</h4>
@@ -255,8 +261,10 @@ const CommonTable = ({
             <thead className="table-light">
               <tr>
                 <th>#</th>
-                {columns.map(col => (
-                  <th key={col.key}>{col.label}</th>
+                {columns.map((col, idx) => (
+                  <th key={col.key || col.header || idx}>
+                    {col.header || col.label}
+                  </th>
                 ))}
                 {hasActions && <th>Actions</th>}
               </tr>
@@ -274,53 +282,69 @@ const CommonTable = ({
                 </tr>
               ) : (
                 paginated.map((row, i) => (
-                  <tr key={row._id || i}>
+                  <tr key={row[rowKey] || i}>
                     <td>{(page - 1) * rowsPerPage + i + 1}</td>
 
-                    {columns.map(col => (
-                      <td key={col.key}>{row[col.key] ?? "-"}</td>
+                    {columns.map((col, idx) => (
+                      <td key={col.key || col.header || idx}>
+                        {getCellValue(row, col)}
+                      </td>
                     ))}
 
                     {hasActions && (
-                      <td className="d-flex gap-2">
-                        {onEdit && (
-                          <button
-                            className="btn btn-sm btn-outline-warning"
-                            onClick={() => onEdit(row)}
-                          >
-                            Edit
-                          </button>
-                        )}
-
-                        {onDelete && (
-                          <button
-                            className="btn btn-sm btn-outline-danger"
-                            onClick={() => onDelete(row)}
-                          >
-                            Delete
-                          </button>
-                        )}
-                        {onAssign && (
-                          <button
-                            className="btn btn-sm btn-outline-success"
-                            onClick={() => onAssign(row)}
-                          >
-                            Assign
-                          </button>
-                        )}
-                        {onView && (
-                          <button
-                            className="btn btn-sm btn-outline-success"
-                            onClick={() => onView(row)}
-                          >
-                            View
-                          </button>
-                        )}
-                        
-                        
+                      <td>
+                        <div className="d-flex gap-2">
+                          {/* Support actions array */}
+                          {actions.length > 0 ? (
+                            actions.map((action, idx) => (
+                              <button
+                                key={idx}
+                                className={`btn btn-sm btn-${action.variant || "primary"}`}
+                                onClick={() => action.onClick(row)}
+                                disabled={action.disabled}
+                              >
+                                {action.label}
+                              </button>
+                            ))
+                          ) : (
+                            <>
+                              {onView && (
+                                <button
+                                  className="btn btn-sm btn-outline-info"
+                                  onClick={() => onView(row)}
+                                >
+                                  View
+                                </button>
+                              )}
+                              {onEdit && (
+                                <button
+                                  className="btn btn-sm btn-outline-warning"
+                                  onClick={() => onEdit(row)}
+                                >
+                                  Edit
+                                </button>
+                              )}
+                              {onDelete && (
+                                <button
+                                  className="btn btn-sm btn-outline-danger"
+                                  onClick={() => onDelete(row)}
+                                >
+                                  Delete
+                                </button>
+                              )}
+                              {onAssign && (
+                                <button
+                                  className="btn btn-sm btn-outline-success"
+                                  onClick={() => onAssign(row)}
+                                >
+                                  Assign
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </div>
                       </td>
                     )}
-
                   </tr>
                 ))
               )}
@@ -330,12 +354,11 @@ const CommonTable = ({
 
         {/* Pagination */}
         <div className="d-flex justify-content-between align-items-center mt-3">
-
           <select
             className="form-select form-select-sm"
             style={{ width: 80 }}
             value={rowsPerPage}
-            onChange={e => {
+            onChange={(e) => {
               setRowsPerPage(Number(e.target.value));
               setPage(1);
             }}
@@ -374,9 +397,7 @@ const CommonTable = ({
               »
             </button>
           </div>
-
         </div>
-
       </div>
     </div>
   );
