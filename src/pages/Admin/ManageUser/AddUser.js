@@ -1,38 +1,40 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../../../utils/axiosInstance";
 import CommonModalForm from "../../../components/common-components/CommonModalForm";
 
-const AddUser = ({ show, onClose, isAdmin = false }) => {
+const AddUser = ({ show, onClose, isAdmin = false, onSuccess }) => {
   const [values, setValues] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phoneNo: "",
-    dob: "",
+    birthDate: "",
     gender: "",
-    address: {
-      houseNo: "",
-      societyName: "",
-      landmark: "",
-      country: "",
-      state: "",
-      city: "",
-      area: "",
-    },
+    houseNo: "",
+    societyName: "",
+    landmark: "",
+    country: "",
+    state: "",
+    city: "",
+    area: "",
   });
 
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const [areas, setAreas] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetchCountries();
-  }, []);
+    if (show) {
+      fetchCountries();
+    }
+  }, [show]);
 
   const fetchCountries = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/countries");
+      const res = await axiosInstance.get("/countries");
       setCountries(res.data.data || []);
     } catch (err) {
       console.error("Country fetch error", err);
@@ -42,9 +44,7 @@ const AddUser = ({ show, onClose, isAdmin = false }) => {
   const fetchStates = async (countryId) => {
     if (!countryId) return;
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/states/country/${countryId}`,
-      );
+      const res = await axiosInstance.get(`/states/country/${countryId}`);
       setStates(res.data.data || []);
     } catch (err) {
       console.error("State fetch error", err);
@@ -54,9 +54,7 @@ const AddUser = ({ show, onClose, isAdmin = false }) => {
   const fetchCities = async (stateId) => {
     if (!stateId) return;
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/cities/state/${stateId}`,
-      );
+      const res = await axiosInstance.get(`/cities/state/${stateId}`);
       setCities(res.data.data || []);
     } catch (err) {
       console.error("City fetch error", err);
@@ -66,9 +64,7 @@ const AddUser = ({ show, onClose, isAdmin = false }) => {
   const fetchAreas = async (cityId) => {
     if (!cityId) return;
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/areas/city/${cityId}`,
-      );
+      const res = await axiosInstance.get(`/areas/city/${cityId}`);
       setAreas(res.data.data || []);
     } catch (err) {
       console.error("Area fetch error", err);
@@ -109,44 +105,63 @@ const AddUser = ({ show, onClose, isAdmin = false }) => {
 
   const handleSubmit = async () => {
     try {
+      setLoading(true);
+      setError("");
+
+      // Validate required fields
+      if (
+        !values.firstName ||
+        !values.lastName ||
+        !values.email ||
+        !values.area
+      ) {
+        setError("Required fields: First Name, Last Name, Email, Area");
+        setLoading(false);
+        return;
+      }
+
       const payload = {
         firstName: values.firstName,
         lastName: values.lastName,
         email: values.email,
         phoneNo: values.phoneNo,
-        dob: values.dob,
+        birthDate: values.birthDate,
         gender: values.gender,
-        address: {
-          houseNo: values.houseNo,
-          societyName: values.societyName,
-          landmark: values.landmark,
-          country: values.country,
-          state: values.state,
-          city: values.city,
-          area: values.area,
-        },
+        houseNo: values.houseNo,
+        societyName: values.societyName,
+        landmark: values.landmark,
+        area: values.area,
+        userType: "user",
       };
 
-      const token = localStorage.getItem("token");
-      const userType = localStorage.getItem("userType");
+      const res = await axiosInstance.post("/users", payload);
 
-      let url = "";
-      let config = {};
-
-      if (token && userType === "superAdmin") {
-        url = "http://localhost:5000/api/auth/admin/create-user";
-        config.headers = { Authorization: `Bearer ${token}` };
-      } else {
-        url = "http://localhost:5000/api/auth/register";
+      if (res.data.Status === 1) {
+        alert("User created successfully!");
+        // Reset form
+        setValues({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phoneNo: "",
+          birthDate: "",
+          gender: "",
+          houseNo: "",
+          societyName: "",
+          landmark: "",
+          country: "",
+          state: "",
+          city: "",
+          area: "",
+        });
+        onSuccess && onSuccess();
+        onClose && onClose();
       }
-
-      await axios.post(url, payload, config);
-
-      alert("User registered successfully!");
-      onClose && onClose();
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Failed to register");
+      setError(err.response?.data?.Message || "Failed to create user");
+      console.error("Add User error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -154,18 +169,19 @@ const AddUser = ({ show, onClose, isAdmin = false }) => {
     {
       title: "Basic Information",
       fields: [
-        { label: "First Name", name: "firstName" },
-        { label: "Last Name", name: "lastName" },
-        { label: "Email", name: "email", type: "email" },
+        { label: "First Name", name: "firstName", required: true },
+        { label: "Last Name", name: "lastName", required: true },
+        { label: "Email", name: "email", type: "email", required: true },
         { label: "Phone No", name: "phoneNo" },
-        { label: "Date of Birth", name: "dob", type: "date" },
+        { label: "Date of Birth", name: "birthDate", type: "date" },
         {
           label: "Gender",
           name: "gender",
-          type: "radio",
+          type: "select",
           options: [
-            { label: "Male", value: "Male" },
-            { label: "Female", value: "Female" },
+            { label: "Select Gender", value: "" },
+            { label: "Male", value: "male" },
+            { label: "Female", value: "female" },
           ],
         },
       ],
@@ -180,37 +196,53 @@ const AddUser = ({ show, onClose, isAdmin = false }) => {
           label: "Country",
           name: "country",
           type: "select",
-          options: countries.map((c) => ({
-            label: c.countryname,
-            value: c._id,
-          })),
+          options: [
+            { label: "Select Country", value: "" },
+            ...countries.map((c) => ({
+              label: c.name,
+              value: c._id,
+            })),
+          ],
         },
         {
           label: "State",
           name: "state",
           type: "select",
-          options: states.map((s) => ({
-            label: s.statename,
-            value: s._id,
-          })),
+          options: [
+            { label: "Select State", value: "" },
+            ...states.map((s) => ({
+              label: s.name,
+              value: s._id,
+            })),
+          ],
+          disabled: !values.country,
         },
         {
           label: "City",
           name: "city",
           type: "select",
-          options: cities.map((c) => ({
-            label: c.cityname,
-            value: c._id,
-          })),
+          options: [
+            { label: "Select City", value: "" },
+            ...cities.map((c) => ({
+              label: c.name,
+              value: c._id,
+            })),
+          ],
+          disabled: !values.state,
         },
         {
           label: "Area",
           name: "area",
           type: "select",
-          options: areas.map((a) => ({
-            label: a.areaname,
-            value: a._id,
-          })),
+          options: [
+            { label: "Select Area", value: "" },
+            ...areas.map((a) => ({
+              label: a.name,
+              value: a._id,
+            })),
+          ],
+          disabled: !values.city,
+          required: true,
         },
       ],
     },
@@ -219,13 +251,15 @@ const AddUser = ({ show, onClose, isAdmin = false }) => {
   return (
     <CommonModalForm
       visible={show}
-      title={isAdmin ? "Add User (Admin)" : "Register User"}
+      title="Add New User"
       sections={sections}
       values={values}
       onChange={handleChange}
       onCancel={onClose}
       onSubmit={handleSubmit}
-      submitLabel={isAdmin ? "Add User" : "Register"}
+      submitLabel="Create User"
+      loading={loading}
+      error={error}
     />
   );
 };

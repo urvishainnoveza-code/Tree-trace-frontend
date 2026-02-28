@@ -1,385 +1,237 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { setAuth } from "../../../utils/auth";
-import "../../../App.css";
+import axiosInstance from "../../../utils/axiosInstance";
+import { setAuth, getAuth } from "../../../utils/auth";
+import {
+  toastSuccess,
+  toastError,
+  toastInfo,
+} from "../../../utils/alertHelper";
+import "./Auth.css";
 
-const Login = () => {
+function Login() {
   const navigate = useNavigate();
 
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleChange = (e) => {
-    setError("");
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleEmailSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      // Optional: call API to verify email
-      // await axios.post("/api/auth/check-email", { email: formData.email });
-
-      setStep(2);
-    } catch (err) {
-      setError("Email not found");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePasswordSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
-    try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        formData
-      );
-
-      const { token, user } = res.data;
-
-      setAuth(token, user.userType);
-
-      if (user.userType === "superAdmin") {
-        navigate("/admin-dashboard");
-      } else {
-        navigate("/user-dashboard");
-      }
-    } catch (err) {
-      setError("Invalid password");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="login-wrapper">
-      <div className="login-card">
-
-        <h1 className="login-title">Welcome Back!</h1>
-
-        {error && (
-          <div className="alert alert-danger text-center">
-            {error}
-          </div>
-        )}
-
-        {step === 1 && (
-          <form onSubmit={handleEmailSubmit}>
-            <div className="mb-3">
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={formData.email}
-                onChange={handleChange}
-                className="form-control"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="btn btn-next w-100"
-              disabled={loading}
-            >
-              {loading ? "Verifying..." : "Next"}
-            </button>
-          </form>
-        )}
-
-        {step === 2 && (
-          <form onSubmit={handlePasswordSubmit}>
-            <div className="mb-2 text-center text-muted small">
-              {formData.email}
-            </div>
-
-            <div className="mb-3">
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                className="form-control"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="btn btn-success w-100"
-              disabled={loading}
-            >
-              {loading ? "Logging in..." : "Log In"}
-            </button>
-            
-            {/*   <div className="text-center mt-3">
-              <button
-                type="button"
-                className="btn btn-link"
-                onClick={() => setStep(1)}
-              >
-                Change Email
-              </button>
-            </div>*/}
-          </form>
-        )}
-
-      </div>
-    </div>
-  );
-};
-
-export default Login;
-
-
-
-/*import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import CommonModel from "../../../components/common-components/CommonModel";
-import CommonForm from "../../../components/common-components/CommonForm";
-import { getAuth, setAuth } from "../../../utils/auth";
-
-const Login = () => {
-  const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(true);
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  //login check
   useEffect(() => {
-    const { token, userType } = getAuth();
-
-    if (!token) return;
-
-    if (userType === "superAdmin") navigate("/admin-dashboard");
-    else navigate("/user-dashboard");
+    const auth = getAuth();
+    if (auth?.token && auth?.user) {
+      const role = auth.user.role?.name;
+      navigate(role === "superAdmin" ? "/admin-dashboard" : "/user-dashboard");
+    }
   }, [navigate]);
 
-  const fields = [
-    { label: "Email", name: "email", required: true },
-    { label: "Password", name: "password", type: "password", required: true },
-  ];
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleClose = () => {
-    setShowModal(false);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault(); 
-
-    try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        formData
-      );
-
-      const { token, user } = res.data;
-
-      // ✅ Save auth using helper
-      setAuth(token, user.userType);
-      // ✅ Redirect by role
-      if (user.userType === "superAdmin") {
-        navigate("/admin-dashboard");
-      } else {
-        navigate("/user-dashboard");
-      }
-
-    } catch (err) {
-      alert("Invalid email or password");
-      console.error(err);
-    }
-  };
-
-  return (
-    <CommonModel
-      show={showModal}
-      title="Login"
-      onSave={handleSubmit}
-      onClose={handleClose}
-      saveText="Login"
-    >
-      <CommonForm
-        fields={fields}
-        formData={formData}
-        onChange={handleChange}
-      />
-    </CommonModel>
-  );
-};
-
-export default Login;*/
-
-
-/*import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import CommonModel from "../../../components/common-components/CommonModel";
-import CommonForm from "../../../components/common-components/CommonForm";
-import "../../../components/common-components/common.css";
-
-const Login = () => {
-  const navigate = useNavigate();
-
-  const [showModal, setShowModal] = useState(true);
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const fields = [
-    { label: "Email", name: "email", required: true },
-    { label: "Password", name: "password", type: "password", required: true },
-  ];
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleClose = () => {
-    setShowModal(false);
-  };
-
-  const handleSubmit = async (e) => {
+  //check email & password
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", formData);
-      const { token, user } = res.data;
+      const normalizedEmail = email.trim();
+      const res = await axiosInstance.post("/users/login", {
+        email: normalizedEmail,
+      });
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("userType", user.userType);
+      console.log("Login Response:", res.data);
+      const { Status, Message } = res.data;
 
-      handleClose();
-
-      if (user.userType === "superAdmin") navigate("/admin-dashboard");
-      else navigate("/user-dashboard");
-
-    } catch (err) {
-      alert("Invalid login");
-    }
-  };
-
-  return (
-    <CommonModel
-      show={showModal}
-      title="Login"
-      onSave={handleSubmit}
-      onClose={handleClose}
-      saveText="Login"
-    >
-      <CommonForm
-        fields={fields}
-        formData={formData}
-        onChange={handleChange}
-      />
-
-      
-    </CommonModel>
-  );
-};
-
-export default Login;*/
-
-
-/*import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import CommonForm from "../../../components/common-components/CommonForm";
-import CommonModel from "../../../components/common-components/CommonModel";
-import "../../../components/common-components/common.css";
-
-const Login = (show,onClose) => {
-  const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const fields = [
-    { label: "Email", name: "email", required: true },
-    { label: "Password", name: "password", type: "password", required: true },
-  ];
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        formData,
-      );
-
-      const { token, user } = res.data;
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("userType", user.userType);
-
-      if (user.userType === "superAdmin") {
-        navigate("/admin-dashboard");
+      if (Status === 2) {
+        toastInfo(Message || "Password required for SuperAdmin");
+        setShowPassword(true);
+      } else if (Status === 3) {
+        console.log("OTP flow triggered, navigating to /otp");
+        toastInfo(Message || "OTP sent to your email");
+        localStorage.setItem("email", normalizedEmail);
+        navigate("/otp");
+      } else if (Status === 1) {
+        const { UserToken, user } = res.data;
+        setAuth(UserToken, user);
+        toastSuccess("Login successful!");
+        setTimeout(
+          () =>
+            navigate(
+              user.role?.name === "superAdmin"
+                ? "/admin-dashboard"
+                : "/user-dashboard",
+            ),
+          500,
+        );
       } else {
-        navigate("/user-dashboard");
+        toastError(Message || "Invalid response from server");
       }
-    } catch (error) {
-      alert(error.response?.data?.message || "Login failed");
+    } catch (err) {
+      console.log("Login Error:", err.response);
+      const responseData = err.response?.data;
+      const { Status, Message } = responseData || {};
+
+      if (Status === 2) {
+        toastInfo(Message || "Password required for SuperAdmin");
+        setShowPassword(true);
+      } else if (Status === 3) {
+        const normalizedEmail = email.trim();
+        console.log("OTP flow triggered in catch, navigating to /otp");
+        toastInfo(Message || "OTP sent to your email");
+        localStorage.setItem("email", normalizedEmail);
+        navigate("/otp");
+      } else {
+        toastError(Message || "User not found");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // STEP 2: SuperAdmin Password Login
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const normalizedEmail = email.trim();
+      const res = await axiosInstance.post("/users/login", {
+        email: normalizedEmail,
+        password,
+      });
+
+      const { Status, UserToken, user, Message } = res.data;
+
+      if (Status === 1 && UserToken && user) {
+        setAuth(UserToken, user);
+        toastSuccess(Message || "SuperAdmin Login Successful!");
+        setTimeout(() => navigate("/admin-dashboard"), 500);
+      } else {
+        toastError(Message || "Invalid password");
+      }
+    } catch (err) {
+      const responseData = err.response?.data;
+      const { Message } = responseData || {};
+      toastError(Message || "Login failed. Please check your password.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <h2 className="login-title">
-          <center>Login</center>
-        </h2>
-        <CommonModel
-          show={show}
-          title="Login"
-          onClose={onClose}
-          onSave={handleSubmit}
-          saveText="Login"
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h2 className="auth-title">Tree Trace</h2>
+          <p className="auth-subtitle">
+            {!showPassword
+              ? "Welcome back! Please login to continue"
+              : "Enter your password"}
+          </p>
+        </div>
 
->
-        
+        <div className="auth-body">
+          {!showPassword ? (
+            // EMAIL FORM
+            <form onSubmit={handleEmailSubmit}>
+              <div className="auth-form-group">
+                <label className="auth-label">
+                  Email Address <span className="auth-required">*</span>
+                </label>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="auth-input"
+                  disabled={isSubmitting}
+                  autoFocus
+                />
+              </div>
 
-        <CommonForm
-          fields={fields}
-          formData={formData}
-          onChange={handleChange}
-         // onSubmit={handleSubmit}
-          />
-          </CommonModel>
+              <button
+                type="submit"
+                className="auth-btn-primary"
+                disabled={isSubmitting || !email}
+              >
+                {isSubmitting ? "Checking..." : "Continue"}
+              </button>
+
+              {/* Sign Up Link */}
+              <div className="auth-divider-top auth-text-center">
+                <p className="auth-muted">
+                  Don't have an account?{" "}
+                  <button
+                    type="button"
+                    className="auth-btn-link"
+                    onClick={() => navigate("/signup")}
+                    disabled={isSubmitting}
+                  >
+                    Sign up here
+                  </button>
+                </p>
+              </div>
+            </form>
+          ) : (
+            // PASSWORD FORM (SuperAdmin)
+            <form onSubmit={handlePasswordSubmit}>
+              <div className="auth-form-group">
+                <label className="auth-label">
+                  Password <span className="auth-required">*</span>
+                </label>
+                <input
+                  type="password"
+                  placeholder="Enter SuperAdmin Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="auth-input"
+                  disabled={isSubmitting}
+                  autoFocus
+                  minLength="6"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="auth-btn-primary"
+                disabled={isSubmitting || !password}
+              >
+                {isSubmitting ? "Logging In..." : "Login as SuperAdmin"}
+              </button>
+
+              <button
+                type="button"
+                className="auth-btn-link auth-btn-back"
+                onClick={() => {
+                  setShowPassword(false);
+                  setPassword("");
+                  setEmail("");
+                }}
+                disabled={isSubmitting}
+              >
+                ← Back to Email
+              </button>
+
+              {/* Sign Up Link */}
+              <div className="auth-divider-top auth-text-center">
+                <p className="auth-muted">
+                  Don't have an account?{" "}
+                  <button
+                    type="button"
+                    className="auth-btn-link"
+                    onClick={() => navigate("/signup")}
+                    disabled={isSubmitting}
+                  >
+                    Sign up here
+                  </button>
+                </p>
+              </div>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
-};
+}
 
-export default Login;*/
+export default Login;
