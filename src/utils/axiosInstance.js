@@ -5,7 +5,6 @@ const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_API || "http://localhost:5000/api",
 });
 
-// Add token to every request
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = getToken();
