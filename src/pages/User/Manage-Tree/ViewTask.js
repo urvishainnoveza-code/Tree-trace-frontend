@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import CommonTable from "../../../components/common-components/CommonTable";
 import CommonFilter from "../../../components/common-components/CommonFilter";
+import axiosInstance from "../../../utils/axiosInstance";
+import { getUser } from "../../../utils/auth";
+import { toastError } from "../../../utils/alertHelper";
 import "../../../components/common-components/common.css";
 
 const ViewTask = () => {
   const [trees, setTrees] = useState([]);
   const [allTrees, setAllTrees] = useState([]);
   const [showFilter, setShowFilter] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [filters, setFilters] = useState({
     areaId: "",
@@ -16,43 +20,93 @@ const ViewTask = () => {
     areaId: [],
   });
 
-  // ---------------------------------
-  // Load Fake Data
-  // ---------------------------------
   useEffect(() => {
-    const fakeTrees = [
-      {
-        _id: "1",
-        treeName: "Neem",
-        treeCount: 20,
-        city: { _id: "c1", cityname: "Surat" },
-        area: { _id: "a1", areaname: "Adajan" },
-      },
-      {
-        _id: "2",
-        treeName: "Peepal",
-        treeCount: 10,
-        city: { _id: "c2", cityname: "Ahmedabad" },
-        area: { _id: "a2", areaname: "Maninagar" },
-      },
-    ];
+    const fetchUserTasks = async () => {
+      setLoading(true);
+      try {
+        const currentUser = getUser();
+        const userId = currentUser?._id;
 
-    setTrees(fakeTrees);
-    setAllTrees(fakeTrees);
+        if (!userId) {
+          setTrees([]);
+          setAllTrees([]);
+          setDropdowns({ areaId: [] });
+          return;
+        }
 
-    // Create unique area dropdown
-    const uniqueAreas = [
-      ...new Map(
-        fakeTrees.map((t) => [
-          t.area._id,
-          { _id: t.area._id, name: t.area.areaname },
-        ])
-      ).values(),
-    ];
+        const groupsRes = await axiosInstance.get("/groups");
+        const groupsList =
+          groupsRes.data?.data ||
+          groupsRes.data?.Data ||
+          groupsRes.data?.groups ||
+          [];
 
-    setDropdowns({
-      areaId: uniqueAreas,
-    });
+        const getGroupUsers = (group) => {
+          if (Array.isArray(group?.users)) return group.users;
+          return [];
+        };
+
+        const userGroupIds = new Set(
+          groupsList
+            .filter((group) =>
+              getGroupUsers(group).some(
+                (user) =>
+                  (typeof user === "string" && user === userId) ||
+                  user?._id === userId,
+              ),
+            )
+            .map((group) => String(group._id)),
+        );
+
+        if (userGroupIds.size === 0) {
+          setTrees([]);
+          setAllTrees([]);
+          setDropdowns({ areaId: [] });
+          return;
+        }
+
+        const assignmentsRes = await axiosInstance.get("/assign", {
+          params: { page: 1, limit: 500 },
+        });
+        const assignments =
+          assignmentsRes.data?.data || assignmentsRes.data?.Data || [];
+
+        const userAssignments = assignments.filter((assignment) => {
+          const groupId =
+            typeof assignment.group === "string"
+              ? assignment.group
+              : assignment.group?._id;
+          return groupId && userGroupIds.has(String(groupId));
+        });
+
+        setTrees(userAssignments);
+        setAllTrees(userAssignments);
+
+        const uniqueAreas = [
+          ...new Map(
+            userAssignments
+              .filter((task) => task?.area?._id)
+              .map((task) => [
+                task.area._id,
+                { _id: task.area._id, name: task.area.name || "N/A" },
+              ]),
+          ).values(),
+        ];
+
+        setDropdowns({ areaId: uniqueAreas });
+      } catch (error) {
+        toastError(
+          error.response?.data?.Message || "Failed to fetch user tasks",
+        );
+        setTrees([]);
+        setAllTrees([]);
+        setDropdowns({ areaId: [] });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserTasks();
   }, []);
 
   // ---------------------------------
@@ -64,9 +118,7 @@ const ViewTask = () => {
     let filtered = [...allTrees];
 
     if (selectedFilters.areaId) {
-      filtered = filtered.filter(
-        (t) => t.area._id === selectedFilters.areaId
-      );
+      filtered = filtered.filter((t) => t.area?._id === selectedFilters.areaId);
     }
 
     setTrees(filtered);
@@ -107,16 +159,27 @@ const ViewTask = () => {
       {/* Table */}
       <CommonTable
         columns={[
-          { label: "Tree Name", key: "treeName" },
-          { label: "Tree Count", key: "treeCount" },
-          { label: "City", key: "city.cityname" },
-          { label: "Area", key: "area.areaname" },
+          { label: "Tree Name", key: "treeName.name" },
+          { label: "Tree Count", key: "count" },
+          { label: "State", key: "state.name" },
+          { label: "City", key: "city.name" },
+          { label: "Area", key: "area.name" },
+          { label: "Group", key: "group.name" },
+          {
+            label: "Status",
+            key: "status",
+            valueMap: {
+              assigned: "Assigned",
+              completed: "Completed",
+              cancelled: "Cancelled",
+            },
+          },
         ]}
         data={trees}
+        loading={loading}
       />
     </div>
   );
 };
 
 export default ViewTask;
-

@@ -1,205 +1,3 @@
-/*import React from "react";
-import "./common.css";
-
-const CommonTable = ({
-  title = "Table",
-  subtitle = "",
-  columns = [],
-  data = [],
-  onEdit,
-  onDelete,
-}) => {
-  const hasActions = Boolean(onEdit || onDelete);
-  const safeData = Array.isArray(data) ? data : [];
-
-  return (
-    <div className="card mb-4">
-      <div className="card-body">
-        <h4 className="card-title">{title}</h4>
-
-        {subtitle && (
-          <p className="card-subtitle mb-4 text-muted">{subtitle}</p>
-        )}
-
-        <div className="table-responsive">
-          <table className="table table-bordered table-hover align-middle mb-0">
-            <thead className="table-light">
-              <tr>
-                <th style={{ width: "60px" }}>#</th>
-
-                {columns.map((col) => (
-                  <th key={col.key}>{col.label}</th>
-                ))}
-
-                {hasActions && (
-                  <th style={{ width: "150px" }}>Actions</th>
-                )}
-              </tr>
-            </thead>
-
-            <tbody>
-              {safeData.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={columns.length + (hasActions ? 2 : 1)}
-                    className="text-center py-4 text-muted"
-                  >
-                    No data found
-                  </td>
-                </tr>
-              ) : (
-                safeData.map((row, index) => (
-                  <tr key={row._id || index}>
-                    <td>{index + 1}</td>
-
-                    {columns.map((col) => (
-                      <td key={col.key}>
-                        {row[col.key] !== undefined &&
-                        row[col.key] !== null
-                          ? row[col.key]
-                          : "-"}
-                      </td>
-                    ))}
-
-                    {hasActions && (
-                      <td>
-                        <div className="d-flex gap-2">
-                          {onEdit && (
-                            <button
-                              className="btn btn-sm btn-outline-warning"
-                              onClick={() => onEdit(row)}
-                            >
-                              Edit
-                            </button>
-                          )}
-
-                          {onDelete && (
-                            <button
-                              className="btn btn-sm btn-outline-danger"
-                              onClick={() => onDelete(row)}
-                            >
-                              Delete
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    )}
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default CommonTable;*/
-/*import React from "react";
-import "./common.css";
-
-const CommonTable = ({
-  title = "Table",
-  subtitle = "",
-  columns = [],
-  data = [],
-  onEdit,
-  onDelete,
-  onAssign,
-}) => {
-const hasActions = Boolean(onEdit || onDelete || onAssign);
-  const safeData = Array.isArray(data) ? data : [];
-
-  // ✅ Helper: supports nested keys like address.country.countryname
-  const getValue = (obj, path) =>
-    path.split(".").reduce((o, key) => (o ? o[key] : null), obj);
-
-  return (
-    <div className="card mb-4">
-      <div className="card-body">
-        <h4 className="card-title">{title}</h4>
-
-        {subtitle && (
-          <p className="card-subtitle mb-4 text-muted">{subtitle}</p>
-        )}
-
-        <div className="table-responsive">
-          <table className="table table-bordered table-hover align-middle mb-0">
-            <thead className="table-light">
-              <tr>
-                <th style={{ width: "60px" }}>#</th>
-
-                {columns.map((col) => (
-                  <th key={col.key}>{col.label}</th>
-                ))}
-
-                {hasActions && <th style={{ width: "150px" }}>Actions</th>}
-              </tr>
-            </thead>
-
-            <tbody>
-              {safeData.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={columns.length + (hasActions ? 2 : 1)}
-                    className="text-center py-4 text-muted"
-                  >
-                    No data found
-                  </td>
-                </tr>
-              ) : (
-                safeData.map((row, index) => (
-                  <tr key={row._id || index}>
-                    <td>{index + 1}</td>
-
-                    {columns.map((col) => (
-                      <td key={col.key}>{getValue(row, col.key) ?? "-"}</td>
-                    ))}
-
-                    {hasActions && (
-                      <td>
-                        <div className="d-flex gap-2">
-                          {onEdit && (
-                            <button
-                              className="btn btn-sm btn-outline-warning"
-                              onClick={() => onEdit(row)}
-                            >
-                              Edit
-                            </button>
-                          )}
-
-                          {onDelete && (
-                            <button
-                              className="btn btn-sm btn-outline-danger"
-                              onClick={() => onDelete(row)}
-                            >
-                              Delete
-                            </button>
-                          )}
-                          {onAssign && (
-                            <button
-                              className="btn btn-success btn-sm"
-                              onClick={() => onAssign(row)}
-                            >
-                              Assign
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    )}
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default CommonTable;*/
 import React, { useState, useMemo } from "react";
 import "./common.css";
 
@@ -207,38 +5,68 @@ const CommonTable = ({
   title = "Table",
   columns = [],
   data = [],
-  actions = [], // NEW: Support actions array
+  actions, // Can be array or function
   onAdd,
   onEdit,
   onDelete,
   onAssign,
   onView,
   addLabel = "+ Add",
-  rowKey = "_id", // NEW: Support custom row key
+  rowKey = "_id",
+  pagination, // External pagination: { currentPage, totalPages, onPageChange }
+  loading = false,
 }) => {
   const safeData = useMemo(() => (Array.isArray(data) ? data : []), [data]);
 
-  const [page, setPage] = useState(1);
+  // Internal pagination state (used when pagination prop is not provided)
+  const [internalPage, setInternalPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const totalPages = Math.max(1, Math.ceil(safeData.length / rowsPerPage));
+  // Use external pagination if provided, otherwise internal
+  const isExternalPagination = Boolean(pagination);
+  const currentPage = isExternalPagination
+    ? pagination.currentPage
+    : internalPage;
+  const totalPages = isExternalPagination
+    ? pagination.totalPages
+    : Math.max(1, Math.ceil(safeData.length / rowsPerPage));
+  const handlePageChange = isExternalPagination
+    ? pagination.onPageChange
+    : setInternalPage;
 
+  // Only paginate locally if using internal pagination
   const paginated = useMemo(() => {
-    return safeData.slice((page - 1) * rowsPerPage, page * rowsPerPage);
-  }, [safeData, page, rowsPerPage]);
+    if (isExternalPagination) {
+      return safeData; // Data already paginated by server
+    }
+    return safeData.slice(
+      (internalPage - 1) * rowsPerPage,
+      internalPage * rowsPerPage,
+    );
+  }, [safeData, internalPage, rowsPerPage, isExternalPagination]);
 
   // Support both actions array and individual callbacks
   const hasActions = Boolean(
-    actions.length || onEdit || onDelete || onAssign || onView,
+    actions || onEdit || onDelete || onAssign || onView,
   );
 
-  // Helper function to get cell value - supports both accessor functions and key strings
+  const getNestedValue = (obj, path) => {
+    if (!obj || !path) return undefined;
+    return path.split(".").reduce((acc, part) => acc?.[part], obj);
+  };
+
+  // Simple key/value style: use column.key for data path and column.label for header
   const getCellValue = (row, column) => {
-    const accessor = column.accessor || column.key;
-    if (typeof accessor === "function") {
-      return accessor(row);
+    const keyPath = column.key;
+    const value =
+      typeof keyPath === "string" ? getNestedValue(row, keyPath) : undefined;
+
+    if (column.valueMap && value !== undefined && value !== null) {
+      const mappedValue = column.valueMap[String(value)];
+      if (mappedValue !== undefined) return mappedValue;
     }
-    return row[accessor] ?? "-";
+
+    return value ?? "-";
   };
 
   return (
@@ -262,8 +90,8 @@ const CommonTable = ({
               <tr>
                 <th>#</th>
                 {columns.map((col, idx) => (
-                  <th key={col.key || col.header || idx}>
-                    {col.header || col.label}
+                  <th key={col.key || col.label || idx}>
+                    {col.label || col.key}
                   </th>
                 ))}
                 {hasActions && <th>Actions</th>}
@@ -271,7 +99,21 @@ const CommonTable = ({
             </thead>
 
             <tbody>
-              {paginated.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan={columns.length + (hasActions ? 2 : 1)}
+                    className="text-center py-3"
+                  >
+                    <div
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                    >
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : paginated.length === 0 ? (
                 <tr>
                   <td
                     colSpan={columns.length + (hasActions ? 2 : 1)}
@@ -283,10 +125,17 @@ const CommonTable = ({
               ) : (
                 paginated.map((row, i) => (
                   <tr key={row[rowKey] || i}>
-                    <td>{(page - 1) * rowsPerPage + i + 1}</td>
+                    <td>
+                      {(currentPage - 1) *
+                        (isExternalPagination && pagination.limit
+                          ? pagination.limit
+                          : rowsPerPage) +
+                        i +
+                        1}
+                    </td>
 
                     {columns.map((col, idx) => (
-                      <td key={col.key || col.header || idx}>
+                      <td key={col.key || col.label || idx}>
                         {getCellValue(row, col)}
                       </td>
                     ))}
@@ -294,18 +143,27 @@ const CommonTable = ({
                     {hasActions && (
                       <td>
                         <div className="d-flex gap-2">
-                          {/* Support actions array */}
-                          {actions.length > 0 ? (
-                            actions.map((action, idx) => (
-                              <button
-                                key={idx}
-                                className={`btn btn-sm btn-${action.variant || "primary"}`}
-                                onClick={() => action.onClick(row)}
-                                disabled={action.disabled}
-                              >
-                                {action.label}
-                              </button>
-                            ))
+                          {/* Support actions array or function */}
+                          {actions ? (
+                            (() => {
+                              const rowActions =
+                                typeof actions === "function"
+                                  ? actions(row)
+                                  : actions;
+                              return rowActions.map((action, idx) => (
+                                <button
+                                  key={idx}
+                                  className={
+                                    action.className ||
+                                    `btn btn-sm btn-${action.variant || "primary"}`
+                                  }
+                                  onClick={() => action.onClick(row)}
+                                  disabled={action.disabled}
+                                >
+                                  {action.label}
+                                </button>
+                              ));
+                            })()
                           ) : (
                             <>
                               {onView && (
@@ -354,25 +212,28 @@ const CommonTable = ({
 
         {/* Pagination */}
         <div className="d-flex justify-content-between align-items-center mt-3">
-          <select
-            className="form-select form-select-sm"
-            style={{ width: 80 }}
-            value={rowsPerPage}
-            onChange={(e) => {
-              setRowsPerPage(Number(e.target.value));
-              setPage(1);
-            }}
-          >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={25}>25</option>
-          </select>
+          {!isExternalPagination && (
+            <select
+              className="form-select form-select-sm"
+              style={{ width: 80 }}
+              value={rowsPerPage}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setInternalPage(1);
+              }}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+            </select>
+          )}
+          {isExternalPagination && <div />}
 
           <div className="d-flex gap-1">
             <button
               className="btn btn-sm btn-outline-secondary"
-              disabled={page === 1}
-              onClick={() => setPage(page - 1)}
+              disabled={currentPage === 1}
+              onClick={() => handlePageChange(currentPage - 1)}
             >
               «
             </button>
@@ -381,9 +242,11 @@ const CommonTable = ({
               <button
                 key={i}
                 className={`btn btn-sm ${
-                  page === i + 1 ? "btn-primary" : "btn-outline-secondary"
+                  currentPage === i + 1
+                    ? "btn-primary"
+                    : "btn-outline-secondary"
                 }`}
-                onClick={() => setPage(i + 1)}
+                onClick={() => handlePageChange(i + 1)}
               >
                 {i + 1}
               </button>
@@ -391,8 +254,8 @@ const CommonTable = ({
 
             <button
               className="btn btn-sm btn-outline-secondary"
-              disabled={page === totalPages}
-              onClick={() => setPage(page + 1)}
+              disabled={currentPage === totalPages}
+              onClick={() => handlePageChange(currentPage + 1)}
             >
               »
             </button>

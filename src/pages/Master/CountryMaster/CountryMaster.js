@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import axiosInstance from "../../../utils/axiosInstance";
 import CommonTable from "../../../components/common-components/CommonTable";
-import CommonModel from "../../../components/common-components/CommonModel";
-import CommonForm from "../../../components/common-components/CommonForm";
+import CommonModalForm from "../../../components/common-components/CommonModalForm";
 import {
   toastSuccess,
   toastError,
@@ -19,39 +18,39 @@ const CountryMaster = () => {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({ name: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const limit = parseInt(process.env.REACT_APP_PAGE_LIMIT || 10);
 
-  const fetchCountries = useCallback(
-    async (page = 1, search = "") => {
-      setLoading(true);
-      try {
-        const params = {
-          page,
-          limit,
-          ...(search && { search }),
-        };
+  // 🔹 Fetch Countries Function (can be called directly or via useEffect)
+  const fetchCountries = async (page = 1, search = "") => {
+    setLoading(true);
+    try {
+      const params = {
+        page,
+        limit,
+        ...(search && { search }),
+      };
 
-        const res = await axiosInstance.get("/countries", { params });
-        const { Status, countries: data, totalCount } = res.data;
+      const res = await axiosInstance.get("/countries", { params });
+      const { Status, countries: data, totalCount } = res.data;
 
-        if (Status === 1) {
-          setCountries(data || []);
-          setTotalCount(totalCount || 0);
-          setCurrentPage(page);
-        } else {
-          toastError("Failed to fetch countries");
-        }
-      } catch (err) {
-        console.error("Fetch countries error:", err);
-        toastError(err.response?.data?.Message || "Failed to fetch countries");
-      } finally {
-        setLoading(false);
+      if (Status === 1) {
+        setCountries(data || []);
+        setTotalCount(totalCount || 0);
+        setCurrentPage(page);
+      } else {
+        toastError("Failed to fetch countries");
       }
-    },
-    [limit],
-  );
+    } catch (err) {
+      console.error("Fetch countries error:", err);
+      toastError(err.response?.data?.Message || "Failed to fetch countries");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // 🔹 Debounce Search
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchQuery.length >= 3 || searchQuery.length === 0) {
@@ -59,12 +58,15 @@ const CountryMaster = () => {
         setCurrentPage(1);
       }
     }, 500);
+
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  // 🔹 Fetch Countries (Controlled by state changes)
   useEffect(() => {
     fetchCountries(currentPage, debouncedSearchQuery);
-  }, [currentPage, debouncedSearchQuery, fetchCountries]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, debouncedSearchQuery]);
 
   const handleOpenAddForm = () => {
     setFormData({ name: "" });
@@ -74,6 +76,7 @@ const CountryMaster = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setFormData({ name: "" });
+    setErrors({});
   };
 
   const handlePageChange = (page) => {
@@ -82,9 +85,11 @@ const CountryMaster = () => {
     }
   };
 
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleModalFormChange = (updatedData) => {
+    setFormData(updatedData);
+    if (errors.name && updatedData.name.trim()) {
+      setErrors({});
+    }
   };
 
   const formFields = [
@@ -92,16 +97,19 @@ const CountryMaster = () => {
       label: "Country Name",
       name: "name",
       type: "text",
-      required: true,
       placeholder: "Enter country name",
     },
   ];
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    // Validate form
+    const newErrors = {};
+    if (!formData.name || !formData.name.trim()) {
+      newErrors.name = "Country name is required";
+    }
 
-    if (!formData.name.trim()) {
-      toastError("Country name is required");
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
@@ -115,9 +123,9 @@ const CountryMaster = () => {
 
       if (Status === 1) {
         toastSuccess(Message || "Country added successfully");
-        setCurrentPage(1);
-        fetchCountries(1, debouncedSearchQuery);
         handleCloseModal();
+        // 🔹 Immediately refresh the list
+        fetchCountries(1, debouncedSearchQuery);
       } else {
         toastError(Message || "Failed to add country");
       }
@@ -141,6 +149,7 @@ const CountryMaster = () => {
 
         if (Status === 1) {
           toastSuccess(Message || "Country deleted successfully");
+          // 🔹 Immediately refresh the list
           fetchCountries(currentPage, debouncedSearchQuery);
         } else {
           toastError(Message || "Failed to delete country");
@@ -286,34 +295,20 @@ const CountryMaster = () => {
         )}
       </div>
 
-      {/* Modal with auto buttons */}
-      <CommonModel
-        show={showModal}
+      {/* Modal Form */}
+      <CommonModalForm
+        visible={showModal}
         title="Add New Country"
-        onClose={handleCloseModal}
-        buttons={[
-          {
-            label: "Cancel",
-            onClick: handleCloseModal,
-            variant: "secondary",
-            disabled: submitting,
-          },
-          {
-            label: submitting ? "Adding..." : "Add Country",
-            onClick: handleSubmit,
-            variant: "success",
-            disabled: submitting,
-          },
-        ]}
-      >
-        <form onSubmit={handleSubmit}>
-          <CommonForm
-            fields={formFields}
-            formData={formData}
-            onChange={handleFormChange}
-          />
-        </form>
-      </CommonModel>
+        fields={formFields}
+        values={formData}
+        onChange={handleModalFormChange}
+        onCancel={handleCloseModal}
+        onSubmit={handleSubmit}
+        submitLabel={submitting ? "Adding..." : "Add Country"}
+        cancelLabel="Cancel"
+        errors={errors}
+        requiredFields={["name"]}
+      />
     </div>
   );
 };

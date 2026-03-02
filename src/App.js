@@ -16,24 +16,27 @@ import Signup from "./pages/Admin/Login/Signup";
 
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import UserIndex from "./pages/Admin/ManageUser/UserIndex";
-import AddUser from "./pages/Admin/ManageUser/AddUser";
-import ViewUser from "./pages/Admin/ManageUser/ViewUser";
 
 import UserDashboard from "./pages/User/UserDashboard";
 
 import AddTree from "./pages/Admin/manage-plantation/AddTree";
 import MasterSetting from "./pages/Master/MasterSetting";
 import CountryMaster from "./pages/Master/CountryMaster/CountryMaster";
-import StateView from "./pages/Master/StateMaster/StateView";
-import ViewCity from "./pages/Master/CityMaster/ViewCity";
-import ViewArea from "./pages/Master/AreaMaster/ViewArea";
-import ViewTreename from "./pages/Master/TreenameMaster/ViewTreename";
+import StateManager from "./pages/Master/StateMaster/StateMaster";
+import CityMaster from "./pages/Master/CityMaster/CityMaster";
+import AreaManager from "./pages/Master/AreaMaster/AreaMaster";
+import TreenameManager from "./pages/Master/TreenameMaster/TreenameMaster";
 import ViewTreeList from "./pages/Admin/manage-plantation/ViewTreeList";
 import ViewTreeDetail from "./pages/User/Manage-Tree/ViewTreeDetail";
 import ViewTask from "./pages/User/Manage-Tree/ViewTask";
 import TreeProfile from "./pages/User/Manage-Tree/TreeProfile";
 
 import UserProfile from "./pages/Admin/ManageUser/UserProfile";
+
+// Tree Assignment Components
+import CreateAssignment from "./pages/Admin/manage-plantation/CreateAssignment";
+import ViewAssignments from "./pages/Admin/manage-plantation/AssignmentIndex";
+import AssignmentDetail from "./pages/Admin/manage-plantation/AssignmentDetail";
 const ProtectedRoute = ({ children, role }) => {
   const token = localStorage.getItem("token");
   const userType = localStorage.getItem("userType");
@@ -73,7 +76,7 @@ function App() {
           path="/manage-user/add"
           element={
             <ProtectedRoute role="superAdmin">
-              <AddUser />
+              <UserIndex />
             </ProtectedRoute>
           }
         />
@@ -81,7 +84,7 @@ function App() {
           path="/manage-user/view/:id"
           element={
             <ProtectedRoute role="superAdmin">
-              <ViewUser />
+              <UserIndex />
             </ProtectedRoute>
           }
         />
@@ -89,7 +92,7 @@ function App() {
           path="/manage-user/edit/:id"
           element={
             <ProtectedRoute role="superAdmin">
-              <ViewUser />
+              <UserIndex />
             </ProtectedRoute>
           }
         />
@@ -154,7 +157,7 @@ function App() {
           path="/states"
           element={
             <ProtectedRoute>
-              <StateView />
+              <StateManager />
             </ProtectedRoute>
           }
         />
@@ -162,7 +165,7 @@ function App() {
           path="/cities"
           element={
             <ProtectedRoute>
-              <ViewCity />
+              <CityMaster />
             </ProtectedRoute>
           }
         />
@@ -170,7 +173,7 @@ function App() {
           path="/areas"
           element={
             <ProtectedRoute>
-              <ViewArea />
+              <AreaManager />
             </ProtectedRoute>
           }
         />
@@ -194,7 +197,32 @@ function App() {
           path="/treename"
           element={
             <ProtectedRoute>
-              <ViewTreename />
+              <TreenameManager />
+            </ProtectedRoute>
+          }
+        />
+        {/* ---------- TREE ASSIGNMENT ROUTES ---------- */}
+        <Route
+          path="/manage-plantation/assign"
+          element={
+            <ProtectedRoute role="superAdmin">
+              <CreateAssignment />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manage-plantation/assignments"
+          element={
+            <ProtectedRoute>
+              <ViewAssignments />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manage-plantation/assignment/:id"
+          element={
+            <ProtectedRoute>
+              <AssignmentDetail />
             </ProtectedRoute>
           }
         />

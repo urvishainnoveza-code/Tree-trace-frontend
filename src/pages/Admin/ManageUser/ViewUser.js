@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "../../../utils/axiosInstance";
 
@@ -15,7 +15,7 @@ const ViewUser = () => {
   const [cities, setCities] = useState([]);
   const [areas, setAreas] = useState([]);
 
-  const fetchUser = useCallback(async () => {
+  const fetchUser = async () => {
     try {
       setLoading(true);
       const res = await axiosInstance.get(`/users/${id}`);
@@ -29,12 +29,13 @@ const ViewUser = () => {
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  };
 
   useEffect(() => {
     fetchUser();
     fetchCountries();
-  }, [fetchUser]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const fetchCountries = async () => {
     try {

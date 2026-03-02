@@ -86,13 +86,20 @@ function Signup() {
       if (Status === 1 && Data?.UserToken && Data?.user) {
         setAuth(Data.UserToken, Data.user);
         toastSuccess(Message || "Account created successfully!");
+
+        // Show profile completion message
         setTimeout(() => {
-          navigate(
-            Data.user.role?.name === "superAdmin"
-              ? "/admin-dashboard"
-              : "/user-dashboard",
-          );
-        }, 500);
+          toastInfo("Complete your profile to access all features!");
+        }, 1500);
+
+        setTimeout(() => {
+          if (Data.user.role?.name === "superAdmin") {
+            navigate("/admin-dashboard");
+          } else {
+            // Redirect to profile edit for regular users
+            navigate("/edit-profile");
+          }
+        }, 2000);
       } else {
         toastError(Message || "Signup failed. Please try again.");
       }
