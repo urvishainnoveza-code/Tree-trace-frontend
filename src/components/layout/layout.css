@@ -37,6 +37,16 @@
   height: 35px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.edit-profile-btn:hover {
+  background: #218838 !important;
+}
+
 .logout-btn {
   background: white;
   color: #37b258;

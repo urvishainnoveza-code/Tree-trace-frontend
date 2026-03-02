@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../../../utils/axiosInstance";
-import CommonModalForm from "../../../components/common-components/CommonModalForm";
+import CommonForm from "../../../components/common-components/CommonForm";
+import CommonModel from "../../../components/common-components/CommonModel";
 
-const AddUser = ({ show, onClose, isAdmin = false, onSuccess }) => {
+const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
   const [values, setValues] = useState({
     firstName: "",
     lastName: "",
@@ -71,12 +72,14 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess }) => {
     }
   };
 
-  const handleChange = (updatedValues) => {
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+
     setValues((prev) => {
-      const next = { ...updatedValues };
+      const next = { ...prev, [name]: value };
 
       if (next.country !== prev.country) {
-        fetchStates(next.country);
+        if (next.country) fetchStates(next.country);
         next.state = "";
         next.city = "";
         next.area = "";
@@ -86,7 +89,7 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess }) => {
       }
 
       if (next.state !== prev.state) {
-        fetchCities(next.state);
+        if (next.state) fetchCities(next.state);
         next.city = "";
         next.area = "";
         setCities([]);
@@ -94,7 +97,7 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess }) => {
       }
 
       if (next.city !== prev.city) {
-        fetchAreas(next.city);
+        if (next.city) fetchAreas(next.city);
         next.area = "";
         setAreas([]);
       }
@@ -108,7 +111,6 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess }) => {
       setLoading(true);
       setError("");
 
-      // Validate required fields
       if (
         !values.firstName ||
         !values.lastName ||
@@ -154,7 +156,8 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess }) => {
           city: "",
           area: "",
         });
-        onSuccess && onSuccess();
+        if (onSuccess) onSuccess();
+        if (onSaved) onSaved();
         onClose && onClose();
       }
     } catch (err) {
@@ -165,102 +168,115 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess }) => {
     }
   };
 
-  const sections = [
+  const fields = [
     {
-      title: "Basic Information",
-      fields: [
-        { label: "First Name", name: "firstName", required: true },
-        { label: "Last Name", name: "lastName", required: true },
-        { label: "Email", name: "email", type: "email", required: true },
-        { label: "Phone No", name: "phoneNo" },
-        { label: "Date of Birth", name: "birthDate", type: "date" },
-        {
-          label: "Gender",
-          name: "gender",
-          type: "select",
-          options: [
-            { label: "Select Gender", value: "" },
-            { label: "Male", value: "male" },
-            { label: "Female", value: "female" },
-          ],
-        },
-      ],
+      label: "First Name",
+      name: "firstName",
+      required: true,
+      colClass: "col-md-6",
     },
     {
-      title: "Address Details",
-      fields: [
-        { label: "House No", name: "houseNo" },
-        { label: "Society Name", name: "societyName" },
-        { label: "Landmark", name: "landmark" },
-        {
-          label: "Country",
-          name: "country",
-          type: "select",
-          options: [
-            { label: "Select Country", value: "" },
-            ...countries.map((c) => ({
-              label: c.name,
-              value: c._id,
-            })),
-          ],
-        },
-        {
-          label: "State",
-          name: "state",
-          type: "select",
-          options: [
-            { label: "Select State", value: "" },
-            ...states.map((s) => ({
-              label: s.name,
-              value: s._id,
-            })),
-          ],
-          disabled: !values.country,
-        },
-        {
-          label: "City",
-          name: "city",
-          type: "select",
-          options: [
-            { label: "Select City", value: "" },
-            ...cities.map((c) => ({
-              label: c.name,
-              value: c._id,
-            })),
-          ],
-          disabled: !values.state,
-        },
-        {
-          label: "Area",
-          name: "area",
-          type: "select",
-          options: [
-            { label: "Select Area", value: "" },
-            ...areas.map((a) => ({
-              label: a.name,
-              value: a._id,
-            })),
-          ],
-          disabled: !values.city,
-          required: true,
-        },
+      label: "Last Name",
+      name: "lastName",
+      required: true,
+      colClass: "col-md-6",
+    },
+    {
+      label: "Email",
+      name: "email",
+      type: "email",
+      required: true,
+      colClass: "col-md-6",
+    },
+    { label: "Phone No", name: "phoneNo", colClass: "col-md-6" },
+    {
+      label: "Date of Birth",
+      name: "birthDate",
+      type: "date",
+      colClass: "col-md-6",
+    },
+    {
+      label: "Gender",
+      name: "gender",
+      type: "select",
+      colClass: "col-md-6",
+      options: [
+        { label: "Male", value: "male" },
+        { label: "Female", value: "female" },
       ],
+    },
+    { label: "House No", name: "houseNo", colClass: "col-md-6" },
+    { label: "Society Name", name: "societyName", colClass: "col-md-6" },
+    { label: "Landmark", name: "landmark", colClass: "col-md-6" },
+    {
+      label: "Country",
+      name: "country",
+      type: "select",
+      colClass: "col-md-6",
+      options: countries.map((c) => ({
+        label: c.name,
+        value: c._id,
+      })),
+    },
+    {
+      label: "State",
+      name: "state",
+      type: "select",
+      colClass: "col-md-6",
+      options: states.map((s) => ({
+        label: s.name,
+        value: s._id,
+      })),
+      disabled: !values.country,
+    },
+    {
+      label: "City",
+      name: "city",
+      type: "select",
+      colClass: "col-md-6",
+      options: cities.map((c) => ({
+        label: c.name,
+        value: c._id,
+      })),
+      disabled: !values.state,
+    },
+    {
+      label: "Area",
+      name: "area",
+      type: "select",
+      required: true,
+      colClass: "col-md-6",
+      options: areas.map((a) => ({
+        label: a.name,
+        value: a._id,
+      })),
+      disabled: !values.city,
     },
   ];
 
   return (
-    <CommonModalForm
-      visible={show}
+    <CommonModel
+      show={show}
       title="Add New User"
-      sections={sections}
-      values={values}
-      onChange={handleChange}
-      onCancel={onClose}
-      onSubmit={handleSubmit}
-      submitLabel="Create User"
-      loading={loading}
-      error={error}
-    />
+      onClose={onClose}
+      buttons={[
+        {
+          label: "Cancel",
+          onClick: onClose,
+          variant: "secondary",
+          disabled: loading,
+        },
+        {
+          label: loading ? "Creating..." : "Create User",
+          onClick: handleSubmit,
+          variant: "primary",
+          disabled: loading,
+        },
+      ]}
+    >
+      {error && <div className="alert alert-danger mb-3">{error}</div>}
+      <CommonForm fields={fields} formData={values} onChange={handleChange} />
+    </CommonModel>
   );
 };
 

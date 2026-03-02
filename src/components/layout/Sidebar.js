@@ -5,8 +5,7 @@ import "./layout.css";
 const Sidebar = () => {
   const userType = localStorage.getItem("userType");
 
-  const navClass = ({ isActive }) =>
-    `sidebar-link ${isActive ? "active" : ""}`;
+  const navClass = ({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`;
 
   return (
     <aside className="sidebar">
@@ -28,13 +27,17 @@ const Sidebar = () => {
             <NavLink to="/tree-list" className={navClass}>
               Tree List
             </NavLink>
+
+            <NavLink to="/manage-plantation/assignments" className={navClass}>
+              Tree Assignments
+            </NavLink>
           </>
         )}
 
         {userType === "user" && (
           <>
             <NavLink to="/view-task" className={navClass}>
-              View Task
+              My Tasks
             </NavLink>
 
             <NavLink to="/tree-detail" className={navClass}>
@@ -48,7 +51,6 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
-
 
 /*import React from "react";
 import { NavLink } from "react-router-dom";
