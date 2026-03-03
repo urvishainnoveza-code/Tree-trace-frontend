@@ -33,6 +33,17 @@ const CommonForm = ({
                 </option>
               ))}
             </select>
+          ) : field.type === "textarea" ? (
+            <textarea
+              name={field.name}
+              className="form-control"
+              value={formData[field.name] || ""}
+              onChange={onChange}
+              required={field.required}
+              disabled={disabled || field.disabled}
+              placeholder={field.placeholder || ""}
+              rows={field.rows || 3}
+            />
           ) : field.type === "radio" ? (
             <div className="radio-group">
               {field.options?.map((opt) => (
@@ -68,6 +79,16 @@ const CommonForm = ({
                 disabled={disabled || field.disabled}
               />
             </div>
+          ) : field.type === "file" ? (
+            <input
+              type="file"
+              name={field.name}
+              className="form-control"
+              onChange={onChange}
+              multiple={field.multiple || false}
+              accept={field.accept || ""}
+              disabled={disabled || field.disabled}
+            />
           ) : (
             <input
               type={field.type || "text"}
@@ -77,6 +98,7 @@ const CommonForm = ({
               onChange={onChange}
               required={field.required}
               disabled={disabled || field.disabled}
+              placeholder={field.placeholder || ""}
             />
           )}
 

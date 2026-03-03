@@ -57,6 +57,10 @@ const CommonTable = ({
 
   // Simple key/value style: use column.key for data path and column.label for header
   const getCellValue = (row, column) => {
+    if (typeof column.render === "function") {
+      return column.render(row);
+    }
+
     const keyPath = column.key;
     const value =
       typeof keyPath === "string" ? getNestedValue(row, keyPath) : undefined;
