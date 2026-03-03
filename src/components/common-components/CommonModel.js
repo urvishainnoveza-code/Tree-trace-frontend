@@ -9,6 +9,7 @@ const CommonModel = ({
   buttons = [], // Array of button objects: [{label, onClick, variant, disabled}]
   onSave,
   saveText = "Save",
+  isSaving = false,
 }) => {
   if (!show) return null;
 
@@ -30,11 +31,19 @@ const CommonModel = ({
     // Fallback to old pattern
     return (
       <>
-        <button className="btn btn-secondary" onClick={onClose}>
+        <button
+          className="btn btn-secondary"
+          onClick={onClose}
+          disabled={isSaving}
+        >
           Close
         </button>
         {onSave && (
-          <button className="btn btn-primary" onClick={onSave}>
+          <button
+            className="btn btn-primary"
+            onClick={onSave}
+            disabled={isSaving}
+          >
             {saveText}
           </button>
         )}

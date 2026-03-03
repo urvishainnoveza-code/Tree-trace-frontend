@@ -14,6 +14,7 @@ const CommonFilter = ({
     cityId: "",
     areaId: "",
     treeId: "",
+    date: "",
     startDate: "",
     endDate: "",
   };
@@ -58,6 +59,7 @@ const CommonFilter = ({
     cityId: "City",
     areaId: "Area",
     treeId: "Tree",
+    date: "Date",
     startDate: "Start Date",
     endDate: "End Date",
   };
@@ -76,13 +78,27 @@ const CommonFilter = ({
             >
               <option value="">All {labelsMap[key]}</option>
               {optionsMap[key].map((item) => (
-                <option key={item._id} value={item._id}>
-                  {item.name || item.treeName || item.areaName || "N/A"}
+                <option
+                  key={item?._id || item?.id || item?.value || String(item)}
+                  value={item?._id || item?.id || item?.value || ""}
+                >
+                  {item?.name ||
+                    item?.treeName ||
+                    item?.areaName ||
+                    item?.areaname ||
+                    (typeof item === "string" ? item : "N/A")}
                 </option>
               ))}
             </select>
           ) : null}
 
+          {key === "date" ? (
+            <input
+              type="date"
+              value={selectedFilters[key]}
+              onChange={(e) => handleChange(key, e.target.value)}
+            />
+          ) : null}
           {/* Date Fields */}
           {key === "startDate" || key === "endDate" ? (
             <input

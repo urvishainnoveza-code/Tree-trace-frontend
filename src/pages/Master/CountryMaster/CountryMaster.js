@@ -163,8 +163,8 @@ const CountryMaster = () => {
 
   const tableColumns = [
     {
-      header: "Country Name",
-      accessor: "name",
+      label: "Country Name",
+      key: "name",
     },
   ];
 

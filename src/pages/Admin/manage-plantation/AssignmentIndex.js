@@ -4,6 +4,7 @@ import axiosInstance from "../../../utils/axiosInstance";
 import { getUserType } from "../../../utils/auth";
 import { toastSuccess, toastError } from "../../../utils/alertHelper";
 import CommonTable from "../../../components/common-components/CommonTable";
+import CommonFilter from "../../../components/common-components/CommonFilter";
 
 const ViewAssignments = () => {
   const navigate = useNavigate();
@@ -12,11 +13,42 @@ const ViewAssignments = () => {
 
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
-  const limit = 10;
+  const limit = parseInt(process.env.REACT_APP_PAGE_LIMIT || 10);
 
+  // Filter states
+  const [showFilter, setShowFilter] = useState(false);
+  const [filters, setFilters] = useState({
+    countryId: "",
+    stateId: "",
+    cityId: "",
+    areaId: "",
+    treeId: "",
+    status: "",
+  });
+  const [filterCountries, setFilterCountries] = useState([]);
+  const [filterStates, setFilterStates] = useState([]);
+  const [filterCities, setFilterCities] = useState([]);
+  const [filterAreas, setFilterAreas] = useState([]);
+  const [filterTrees, setFilterTrees] = useState([]);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.length >= 3 || searchQuery.length === 0) {
+        setDebouncedSearchQuery(searchQuery);
+        setCurrentPage(1);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Fetch assignments with filters
   useEffect(() => {
     const fetchAssignments = async () => {
       setLoading(true);
@@ -24,18 +56,24 @@ const ViewAssignments = () => {
         const params = {
           page: currentPage,
           limit,
+          search: debouncedSearchQuery,
         };
 
-        const res = await axiosInstance.get("/assign", { params });
+        // Add filter params
+        if (filters.countryId) params.country = filters.countryId;
+        if (filters.stateId) params.state = filters.stateId;
+        if (filters.cityId) params.city = filters.cityId;
+        if (filters.areaId) params.area = filters.areaId;
+        if (filters.treeId) params.treeName = filters.treeId;
+        if (filters.status) params.status = filters.status;
 
-        console.log("Assignments Response:", res.data);
+        const res = await axiosInstance.get("/assign", { params });
 
         if (res.data.Status === 1) {
           setAssignments(res.data.data || res.data.Data || []);
           setTotalPages(res.data.TotalPages || res.data.totalPages || 1);
           setTotalRecords(res.data.TotalRecords || res.data.totalRecords || 0);
         } else {
-          console.log("No assignments or Status !== 1:", res.data);
           setAssignments([]);
         }
       } catch (err) {
@@ -50,7 +88,94 @@ const ViewAssignments = () => {
     };
 
     fetchAssignments();
-  }, [currentPage]);
+  }, [currentPage, debouncedSearchQuery, filters]);
+
+  // Fetch filter dropdowns
+  const fetchFilterCountries = async () => {
+    try {
+      const res = await axiosInstance.get("/countries");
+      const payload = res.data || {};
+      setFilterCountries(payload.data || payload.countries || []);
+    } catch (err) {
+      console.error("Filter country fetch error:", err);
+    }
+  };
+
+  const fetchFilterStates = async () => {
+    try {
+      const res = await axiosInstance.get("/states");
+      const payload = res.data || {};
+      setFilterStates(payload.data || payload.states || []);
+    } catch (err) {
+      console.error("Filter state fetch error:", err);
+      setFilterStates([]);
+    }
+  };
+
+  const fetchFilterCities = async () => {
+    try {
+      const res = await axiosInstance.get("/cities");
+      const payload = res.data || {};
+      setFilterCities(payload.data || payload.cities || []);
+    } catch (err) {
+      console.error("Filter city fetch error:", err);
+      setFilterCities([]);
+    }
+  };
+
+  const fetchFilterAreas = async () => {
+    try {
+      const res = await axiosInstance.get("/areas");
+      const payload = res.data || {};
+      setFilterAreas(payload.data || payload.areas || []);
+    } catch (err) {
+      console.error("Filter area fetch error:", err);
+      setFilterAreas([]);
+    }
+  };
+
+  const fetchFilterTrees = async () => {
+    try {
+      const res = await axiosInstance.get("/treename");
+      const payload = res.data || {};
+      setFilterTrees(
+        payload.Data ||
+          payload.data ||
+          payload.treeName ||
+          [],
+      );
+    } catch (err) {
+      console.error("Filter tree fetch error:", err);
+      setFilterTrees([]);
+    }
+  };
+
+  // Load all filter dropdowns on mount
+  useEffect(() => {
+    fetchFilterCountries();
+    fetchFilterStates();
+    fetchFilterCities();
+    fetchFilterAreas();
+    fetchFilterTrees();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      countryId: "",
+      stateId: "",
+      cityId: "",
+      areaId: "",
+      treeId: "",
+      status: "",
+    });
+    setCurrentPage(1);
+  };
 
   const handleCancelAssignment = async (assignmentId) => {
     if (!window.confirm("Cancel this assignment?")) return;
@@ -75,6 +200,8 @@ const ViewAssignments = () => {
   const tableColumns = [
     { label: "Tree Name", key: "treeName.name" },
     { label: "Count", key: "count" },
+    { label: "Country", key: "country.name" },
+    { label: "State", key: "state.name" },
     { label: "City", key: "city.name" },
     { label: "Area", key: "area.name" },
     { label: "Group", key: "group.name" },
@@ -114,17 +241,59 @@ const ViewAssignments = () => {
       <div className="card border-0 shadow-sm">
         <div className="card-header d-flex justify-content-between align-items-center">
           <h5 className="mb-0">Tree Assignments</h5>
-          {isSuperAdmin && (
+          <div className="d-flex gap-2">
             <button
-              className="btn btn-primary btn-sm"
-              onClick={() => navigate("/manage-plantation/assign")}
+              className="btn btn-outline-secondary btn-sm"
+              onClick={() => setShowFilter(!showFilter)}
             >
-              + Assign Trees
+              {showFilter ? "Hide Filter" : "Show Filter"}
             </button>
-          )}
+            {isSuperAdmin && (
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => navigate("/manage-plantation/assign")}
+              >
+                + Assign Trees
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="card-body">
+          {/* Filter */}
+          {showFilter && (
+            <CommonFilter
+              filters={filters}
+              dropdowns={{
+                countryId: filterCountries,
+                stateId: filterStates,
+                cityId: filterCities,
+                areaId: filterAreas,
+                treeId: filterTrees,
+              }}
+              onFilterChange={handleFilterChange}
+              onClearFilters={handleClearFilters}
+              filtersToShow={[
+                "countryId",
+                "stateId",
+                "cityId",
+                "areaId",
+                "treeId",
+              ]}
+            />
+          )}
+
+          {/* Search */}
+          <div className="mb-3">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search assignments..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
           {/* Table */}
           <CommonTable
             columns={tableColumns}
