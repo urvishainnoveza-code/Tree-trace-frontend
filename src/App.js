@@ -26,10 +26,11 @@ import StateManager from "./pages/Master/StateMaster/StateMaster";
 import CityMaster from "./pages/Master/CityMaster/CityMaster";
 import AreaManager from "./pages/Master/AreaMaster/AreaMaster";
 import TreenameManager from "./pages/Master/TreenameMaster/TreenameMaster";
+import ViewTreeList from "./pages/Admin/manage-plantation/ViewTreeList";
 import ViewTreeDetail from "./pages/User/Manage-Tree/TreeDetailIndex";
 import ViewTask from "./pages/User/Manage-Tree/ViewTask";
 import TreeProfile from "./pages/User/Manage-Tree/TreeProfile";
-import GroupMembers from "./pages/User/Manage-Tree/GroupMembers";
+import GroupMembers from "./pages/User/GroupMember";
 
 import UserProfile from "./pages/Admin/ManageUser/UserProfile";
 
@@ -101,6 +102,14 @@ function App() {
           element={
             <ProtectedRoute role="user">
               <UserDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/groupMember"
+          element={
+            <ProtectedRoute role="user">
+              <GroupMembers />
             </ProtectedRoute>
           }
         />

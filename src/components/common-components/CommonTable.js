@@ -70,6 +70,18 @@ const CommonTable = ({
       if (mappedValue !== undefined) return mappedValue;
     }
 
+    if (typeof value === "object" && value !== null) {
+      if (typeof value.name === "string") return value.name;
+      if (
+        typeof value.firstName === "string" &&
+        typeof value.lastName === "string"
+      ) {
+        return `${value.firstName} ${value.lastName}`.trim();
+      }
+      if (typeof value.firstName === "string") return value.firstName;
+      return "-";
+    }
+
     return value ?? "-";
   };
 

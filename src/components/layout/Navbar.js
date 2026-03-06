@@ -30,36 +30,36 @@ const Navbar = () => {
             ManageUser
           </NavLink>
 
-          
-
           <NavLink
             to="/tree-list"
             className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
           >
             Tree list
           </NavLink>
-         
 
-        </>
-      )}
-      {userType === "user" && (
-        <>
-          
-          <NavLink
-            to="/view-task"
-            className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
-          >
-            ViewTask
-          </NavLink>
-          
           <NavLink
             to="/tree-detail"
             className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
           >
             Tree detail
           </NavLink>
-          
+        </>
+      )}
+      {userType === "user" && (
+        <>
+          <NavLink
+            to="/view-task"
+            className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+          >
+            ViewTask
+          </NavLink>
 
+          <NavLink
+            to="/tree-detail"
+            className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+          >
+            Tree detail
+          </NavLink>
         </>
       )}
     </nav>

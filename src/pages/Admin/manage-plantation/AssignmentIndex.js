@@ -88,7 +88,7 @@ const ViewAssignments = () => {
     };
 
     fetchAssignments();
-  }, [currentPage, debouncedSearchQuery, filters]);
+  }, [currentPage, debouncedSearchQuery, filters, limit]);
 
   // Fetch filter dropdowns
   const fetchFilterCountries = async () => {
@@ -138,12 +138,7 @@ const ViewAssignments = () => {
     try {
       const res = await axiosInstance.get("/treename");
       const payload = res.data || {};
-      setFilterTrees(
-        payload.Data ||
-          payload.data ||
-          payload.treeName ||
-          [],
-      );
+      setFilterTrees(payload.Data || payload.data || payload.treeName || []);
     } catch (err) {
       console.error("Filter tree fetch error:", err);
       setFilterTrees([]);
@@ -183,8 +178,12 @@ const ViewAssignments = () => {
     try {
       const res = await axiosInstance.put(`/assign/${assignmentId}/cancel`);
       if (res.data.Status === 1) {
-        toastSuccess("Assignment cancelled");
-        setCurrentPage(1);
+        toastSuccess(res.data.Message || "Assignment cancelled");
+        setAssignments((prev) =>
+          prev.map((item) =>
+            item._id === assignmentId ? { ...item, status: "cancelled" } : item,
+          ),
+        );
       } else {
         toastError(res.data.Message || "Failed to cancel assignment");
       }
@@ -238,29 +237,28 @@ const ViewAssignments = () => {
 
   return (
     <div className="container mt-4">
-      <div className="card border-0 shadow-sm">
-        <div className="card-header d-flex justify-content-between align-items-center">
-          <h5 className="mb-0">Tree Assignments</h5>
-          <div className="d-flex gap-2">
-            <button
-              className="btn btn-outline-secondary btn-sm"
-              onClick={() => setShowFilter(!showFilter)}
-            >
-              {showFilter ? "Hide Filter" : "Show Filter"}
-            </button>
-            {isSuperAdmin && (
+      {isSuperAdmin && (
+        <>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h3>Tree Assignments</h3>
+            <div className="d-flex align-items-center gap-2">
               <button
-                className="btn btn-primary btn-sm"
-                onClick={() => navigate("/manage-plantation/assign")}
+                className="btn btn-outline-secondary"
+                onClick={() => setShowFilter(!showFilter)}
               >
-                + Assign Trees
+                {showFilter ? "Hide Filter" : "Show Filter"}
               </button>
-            )}
+              <input
+                type="text"
+                className="form-control"
+                style={{ width: "280px" }}
+                placeholder="Search assignments..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="card-body">
-          {/* Filter */}
           {showFilter && (
             <CommonFilter
               filters={filters}
@@ -282,37 +280,29 @@ const ViewAssignments = () => {
               ]}
             />
           )}
+        </>
+      )}
 
-          {/* Search */}
-          <div className="mb-3">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search assignments..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+      {/* Table */}
+      <CommonTable
+        title="Assignment List"
+        addLabel="+ Assign Trees"
+        columns={tableColumns}
+        data={assignments}
+        loading={loading}
+        actions={getActions}
+        onAdd={() => navigate("/manage-plantation/assign")}
+        pagination={{
+          currentPage,
+          totalPages,
+          onPageChange: setCurrentPage,
+          limit,
+        }}
+      />
 
-          {/* Table */}
-          <CommonTable
-            columns={tableColumns}
-            data={assignments}
-            loading={loading}
-            actions={getActions}
-            pagination={{
-              currentPage,
-              totalPages,
-              onPageChange: setCurrentPage,
-              limit,
-            }}
-          />
-
-          {/* Summary */}
-          <div className="mt-2 text-muted">
-            Showing {assignments.length} of {totalRecords} assignments
-          </div>
-        </div>
+      {/* Summary */}
+      <div className="mt-2 text-muted">
+        Showing {assignments.length} of {totalRecords} assignments
       </div>
     </div>
   );

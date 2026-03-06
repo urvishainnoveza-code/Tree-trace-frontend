@@ -38,6 +38,15 @@ const ViewTreeDetail = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const toLocalDateInputValue = (dateValue) => {
+    const parsedDate = new Date(dateValue);
+    if (Number.isNaN(parsedDate.getTime())) return "";
+    const year = parsedDate.getFullYear();
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const fetchPlantations = async () => {
     setLoading(true);
     try {
@@ -155,9 +164,7 @@ const ViewTreeDetail = () => {
     if (selectedFilters.date) {
       filtered = filtered.filter((t) => {
         if (!t.plantationDate) return false;
-        const plantationDate = new Date(t.plantationDate)
-          .toISOString()
-          .split("T")[0];
+        const plantationDate = toLocalDateInputValue(t.plantationDate);
         return plantationDate === selectedFilters.date;
       });
     }
@@ -283,7 +290,7 @@ const ViewTreeDetail = () => {
         columns={columns}
         data={treeDetail}
         loading={loading}
-        onEdit={handleEdit}
+        onEdit={userType === "superAdmin" ? undefined : handleEdit}
         onView={(row) => navigate(`/tree-profile/${row._id}`)}
       />
 

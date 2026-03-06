@@ -14,6 +14,7 @@ const CommonFilter = ({
     cityId: "",
     areaId: "",
     treeId: "",
+    status: "",
     date: "",
     startDate: "",
     endDate: "",
@@ -51,6 +52,7 @@ const CommonFilter = ({
     cityId: dropdowns.cityId || [],
     areaId: dropdowns.areaId || [],
     treeId: dropdowns.treeId || [],
+    status: dropdowns.status || [],
   };
 
   const labelsMap = {
@@ -59,6 +61,7 @@ const CommonFilter = ({
     cityId: "City",
     areaId: "Area",
     treeId: "Tree",
+    status: "Status",
     date: "Date",
     startDate: "Start Date",
     endDate: "End Date",
@@ -100,7 +103,7 @@ const CommonFilter = ({
             />
           ) : null}
           {/* Date Fields */}
-          {key === "startDate" || key === "endDate" ? (
+          {key === "date" || key === "startDate" || key === "endDate" ? (
             <input
               type="date"
               value={selectedFilters[key]}

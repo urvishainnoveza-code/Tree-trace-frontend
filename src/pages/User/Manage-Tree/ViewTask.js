@@ -16,11 +16,19 @@ const ViewTask = () => {
   const [selectedTask, setSelectedTask] = useState(null);
 
   const [filters, setFilters] = useState({
+    countryId: "",
+    stateId: "",
+    cityId: "",
     areaId: "",
+    treeId: "",
   });
 
   const [dropdowns, setDropdowns] = useState({
+    countryId: [],
+    stateId: [],
+    cityId: [],
     areaId: [],
+    treeId: [],
   });
 
   const fetchUserTasks = async () => {
@@ -32,7 +40,13 @@ const ViewTask = () => {
       if (!userId) {
         setTrees([]);
         setAllTrees([]);
-        setDropdowns({ areaId: [] });
+        setDropdowns({
+          countryId: [],
+          stateId: [],
+          cityId: [],
+          areaId: [],
+          treeId: [],
+        });
         return;
       }
 
@@ -63,7 +77,13 @@ const ViewTask = () => {
       if (userGroupIds.size === 0) {
         setTrees([]);
         setAllTrees([]);
-        setDropdowns({ areaId: [] });
+        setDropdowns({
+          countryId: [],
+          stateId: [],
+          cityId: [],
+          areaId: [],
+          treeId: [],
+        });
         return;
       }
 
@@ -82,11 +102,40 @@ const ViewTask = () => {
       });
 
       setAllTrees(userAssignments);
-      setTrees(
-        filters.areaId
-          ? userAssignments.filter((task) => task.area?._id === filters.areaId)
-          : userAssignments,
-      );
+      setTrees(userAssignments);
+
+      const uniqueCountries = [
+        ...new Map(
+          userAssignments
+            .filter((task) => task?.country?._id)
+            .map((task) => [
+              task.country._id,
+              { _id: task.country._id, name: task.country.name || "N/A" },
+            ]),
+        ).values(),
+      ];
+
+      const uniqueStates = [
+        ...new Map(
+          userAssignments
+            .filter((task) => task?.state?._id)
+            .map((task) => [
+              task.state._id,
+              { _id: task.state._id, name: task.state.name || "N/A" },
+            ]),
+        ).values(),
+      ];
+
+      const uniqueCities = [
+        ...new Map(
+          userAssignments
+            .filter((task) => task?.city?._id)
+            .map((task) => [
+              task.city._id,
+              { _id: task.city._id, name: task.city.name || "N/A" },
+            ]),
+        ).values(),
+      ];
 
       const uniqueAreas = [
         ...new Map(
@@ -99,12 +148,35 @@ const ViewTask = () => {
         ).values(),
       ];
 
-      setDropdowns({ areaId: uniqueAreas });
+      const uniqueTreeNames = [
+        ...new Map(
+          userAssignments
+            .filter((task) => task?.treeName?._id)
+            .map((task) => [
+              task.treeName._id,
+              { _id: task.treeName._id, name: task.treeName.name || "N/A" },
+            ]),
+        ).values(),
+      ];
+
+      setDropdowns({
+        countryId: uniqueCountries,
+        stateId: uniqueStates,
+        cityId: uniqueCities,
+        areaId: uniqueAreas,
+        treeId: uniqueTreeNames,
+      });
     } catch (error) {
       toastError(error.response?.data?.Message || "Failed to fetch user tasks");
       setTrees([]);
       setAllTrees([]);
-      setDropdowns({ areaId: [] });
+      setDropdowns({
+        countryId: [],
+        stateId: [],
+        cityId: [],
+        areaId: [],
+        treeId: [],
+      });
     } finally {
       setLoading(false);
     }
@@ -115,26 +187,48 @@ const ViewTask = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ---------------------------------
-  // Apply Filter
-  // ---------------------------------
   const handleFilterChange = (selectedFilters) => {
     setFilters(selectedFilters);
 
     let filtered = [...allTrees];
 
+    if (selectedFilters.countryId) {
+      filtered = filtered.filter(
+        (t) => t.country?._id === selectedFilters.countryId,
+      );
+    }
+
+    if (selectedFilters.stateId) {
+      filtered = filtered.filter(
+        (t) => t.state?._id === selectedFilters.stateId,
+      );
+    }
+
+    if (selectedFilters.cityId) {
+      filtered = filtered.filter((t) => t.city?._id === selectedFilters.cityId);
+    }
+
     if (selectedFilters.areaId) {
       filtered = filtered.filter((t) => t.area?._id === selectedFilters.areaId);
+    }
+
+    if (selectedFilters.treeId) {
+      filtered = filtered.filter(
+        (t) => t.treeName?._id === selectedFilters.treeId,
+      );
     }
 
     setTrees(filtered);
   };
 
-  // ---------------------------------
-  // Clear Filter
-  // ---------------------------------
   const handleClearFilters = () => {
-    setFilters({ areaId: "" });
+    setFilters({
+      countryId: "",
+      stateId: "",
+      cityId: "",
+      areaId: "",
+      treeId: "",
+    });
     setTrees(allTrees);
   };
 
@@ -156,7 +250,7 @@ const ViewTask = () => {
         <CommonFilter
           filters={filters}
           dropdowns={dropdowns}
-          filtersToShow={["areaId"]}
+          filtersToShow={["countryId", "stateId", "cityId", "areaId", "treeId"]}
           onFilterChange={handleFilterChange}
           onClearFilters={handleClearFilters}
         />
@@ -209,23 +303,36 @@ const ViewTask = () => {
             render: (item) => {
               const remaining =
                 (item.count || 0) - (item.totalPlantedCount || 0);
+              const isCancelled = item.status === "cancelled";
               const isCompleted = item.status === "completed" || remaining <= 0;
 
               return (
                 <button
-                  className={`btn btn-sm ${isCompleted ? "btn-secondary" : "btn-success"}`}
+                  className={`btn btn-sm ${
+                    isCancelled
+                      ? "btn-danger"
+                      : isCompleted
+                        ? "btn-secondary"
+                        : "btn-success"
+                  }`}
                   onClick={() => {
                     setSelectedTask(item);
                     setShowAddTreeDetail(true);
                   }}
-                  disabled={isCompleted}
+                  disabled={isCompleted || isCancelled}
                   title={
-                    isCompleted
-                      ? "All trees planted"
-                      : `${remaining} trees remaining`
+                    isCancelled
+                      ? "Assignment cancelled"
+                      : isCompleted
+                        ? "All trees planted"
+                        : `${remaining} trees remaining`
                   }
                 >
-                  {isCompleted ? "Completed" : "Plant"}
+                  {isCancelled
+                    ? "Cancelled"
+                    : isCompleted
+                      ? "Completed"
+                      : "Plant"}
                 </button>
               );
             },

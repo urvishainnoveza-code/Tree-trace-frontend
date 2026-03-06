@@ -41,7 +41,7 @@ const UserIndex = () => {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalUsers, setTotalUsers] = useState(0);
+  //const [totalUsers, setTotalUsers] = useState(0);
   const [mode, setMode] = useState("add");
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -116,7 +116,7 @@ const UserIndex = () => {
         );
         setUsers(filteredUsers);
         setTotalPages(usersPayload.totalPages || 1);
-        setTotalUsers(usersPayload.totalUsers || 0);
+       // setTotalUsers(usersPayload.totalUsers || 0);
       } else {
         toastError(
           payload.Message || payload.message || "Failed to fetch users",
@@ -622,16 +622,22 @@ const UserIndex = () => {
         <>
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h3>Manage Users</h3>
-            <div className="d-flex gap-2">
-              <button
+            <div className="d-flex align-items-center gap-2">
+                <button
                 className="btn btn-outline-secondary"
                 onClick={() => setShowFilter(!showFilter)}
               >
                 {showFilter ? "Hide Filter" : "Show Filter"}
               </button>
-              <button className="btn btn-primary" onClick={openAddModal}>
-                Add New User
-              </button>
+              <input
+                type="text"
+                className="form-control"
+                style={{ width: "280px" }}
+                placeholder="Search users by name, email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            
             </div>
           </div>
 
@@ -650,16 +656,6 @@ const UserIndex = () => {
             />
           )}
 
-          <div className="mb-3">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search users by name, email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-
           {loading ? (
             <div className="text-center py-5">
               <div className="spinner-border" role="status">
@@ -668,10 +664,12 @@ const UserIndex = () => {
             </div>
           ) : (
             <>
-              {isSuperAdmin && (
+                {/* {isSuperAdmin && (
                 <div className="mb-2 text-muted">Total Users: {totalUsers}</div>
-              )}
+              )}*/}
               <CommonTable
+                title="User List"
+                addLabel="+ Add User"
                 columns={[
                   { label: "Name", key: "firstName" },
                   { label: "Email", key: "email" },
@@ -696,6 +694,7 @@ const UserIndex = () => {
                   }
                   handleEditUser(user);
                 }}
+                onAdd={openAddModal}
                 onDelete={handleDeleteUser}
                 rowKey="_id"
               />

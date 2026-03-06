@@ -85,9 +85,22 @@ const CommonForm = ({
               name={field.name}
               className="form-control"
               onChange={onChange}
-              multiple={field.multiple || false}
-              accept={field.accept || ""}
+              required={field.required}
               disabled={disabled || field.disabled}
+              multiple={field.multiple}
+              accept={field.accept}
+              placeholder={field.placeholder}
+            />
+          ) : field.type === "textarea" ? (
+            <textarea
+              name={field.name}
+              className="form-control"
+              value={formData[field.name] || ""}
+              onChange={onChange}
+              required={field.required}
+              disabled={disabled || field.disabled}
+              placeholder={field.placeholder}
+              rows={field.rows || 3}
             />
           ) : (
             <input
@@ -98,7 +111,10 @@ const CommonForm = ({
               onChange={onChange}
               required={field.required}
               disabled={disabled || field.disabled}
-              placeholder={field.placeholder || ""}
+              placeholder={field.placeholder}
+              min={field.min}
+              max={field.max}
+              step={field.step}
             />
           )}
 
