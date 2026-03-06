@@ -33,6 +33,17 @@ const CommonForm = ({
                 </option>
               ))}
             </select>
+          ) : field.type === "textarea" ? (
+            <textarea
+              name={field.name}
+              className="form-control"
+              value={formData[field.name] || ""}
+              onChange={onChange}
+              required={field.required}
+              disabled={disabled || field.disabled}
+              placeholder={field.placeholder || ""}
+              rows={field.rows || 3}
+            />
           ) : field.type === "radio" ? (
             <div className="radio-group">
               {field.options?.map((opt) => (

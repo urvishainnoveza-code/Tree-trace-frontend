@@ -92,7 +92,7 @@ function App() {
         <Route
           path="/manage-user/edit/:id"
           element={
-            <ProtectedRoute role="superAdmin">
+            <ProtectedRoute>
               <UserIndex />
             </ProtectedRoute>
           }
@@ -122,14 +122,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/tree-list"
-          element={
-            <ProtectedRoute>
-              <ViewTreeList />
-            </ProtectedRoute>
-          }
-        />
+       
         <Route
           path="/view-task"
           element={
@@ -199,6 +192,14 @@ function App() {
           element={
             <ProtectedRoute>
               <TreeProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/group-members"
+          element={
+            <ProtectedRoute role="user">
+              <GroupMembers />
             </ProtectedRoute>
           }
         />
