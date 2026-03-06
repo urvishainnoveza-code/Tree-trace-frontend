@@ -68,6 +68,29 @@ const CommonForm = ({
                 disabled={disabled || field.disabled}
               />
             </div>
+          ) : field.type === "file" ? (
+            <input
+              type="file"
+              name={field.name}
+              className="form-control"
+              onChange={onChange}
+              required={field.required}
+              disabled={disabled || field.disabled}
+              multiple={field.multiple}
+              accept={field.accept}
+              placeholder={field.placeholder}
+            />
+          ) : field.type === "textarea" ? (
+            <textarea
+              name={field.name}
+              className="form-control"
+              value={formData[field.name] || ""}
+              onChange={onChange}
+              required={field.required}
+              disabled={disabled || field.disabled}
+              placeholder={field.placeholder}
+              rows={field.rows || 3}
+            />
           ) : (
             <input
               type={field.type || "text"}
@@ -77,6 +100,10 @@ const CommonForm = ({
               onChange={onChange}
               required={field.required}
               disabled={disabled || field.disabled}
+              placeholder={field.placeholder}
+              min={field.min}
+              max={field.max}
+              step={field.step}
             />
           )}
 

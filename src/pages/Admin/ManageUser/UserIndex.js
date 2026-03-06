@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../../../utils/axiosInstance";
 import CommonTable from "../../../components/common-components/CommonTable";
 import CommonForm from "../../../components/common-components/CommonForm";
+import CommonFilter from "../../../components/common-components/CommonFilter";
 import { getUser, getUserType } from "../../../utils/auth";
 import {
   confirmDelete,
@@ -40,7 +41,7 @@ const UserIndex = () => {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalUsers, setTotalUsers] = useState(0);
+  //const [totalUsers, setTotalUsers] = useState(0);
   const [mode, setMode] = useState("add");
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -51,6 +52,19 @@ const UserIndex = () => {
   const [cities, setCities] = useState([]);
   const [areas, setAreas] = useState([]);
   const [formFields, setFormFields] = useState([]);
+
+  // Filter states
+  const [showFilter, setShowFilter] = useState(false);
+  const [filters, setFilters] = useState({
+    countryId: "",
+    stateId: "",
+    cityId: "",
+    areaId: "",
+  });
+  const [filterCountries, setFilterCountries] = useState([]);
+  const [filterStates, setFilterStates] = useState([]);
+  const [filterCities, setFilterCities] = useState([]);
+  const [filterAreas, setFilterAreas] = useState([]);
 
   const isSuperAdmin = userType === "superAdmin";
 
@@ -67,17 +81,23 @@ const UserIndex = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const fetchUsers = async (page = 1, search = "") => {
+  const fetchUsers = async (page = 1, search = "", filterParams = {}) => {
     setLoading(true);
     try {
       const params = { page, limit, search };
+
+      // Add filter params
+      if (filterParams.countryId) params.country = filterParams.countryId;
+      if (filterParams.stateId) params.state = filterParams.stateId;
+      if (filterParams.cityId) params.city = filterParams.cityId;
+      if (filterParams.areaId) params.area = filterParams.areaId;
 
       if (userType) {
         params.userType = userType;
       }
 
       if (userType === "superAdmin") {
-        params.excludeRole = "superAdmin"; // Tell backend to exclude superAdmin records
+        params.excludeRole = "superAdmin";
       }
 
       if (userType !== "superAdmin" && loggedInUser?._id) {
@@ -96,7 +116,7 @@ const UserIndex = () => {
         );
         setUsers(filteredUsers);
         setTotalPages(usersPayload.totalPages || 1);
-        setTotalUsers(usersPayload.totalUsers || 0);
+       // setTotalUsers(usersPayload.totalUsers || 0);
       } else {
         toastError(
           payload.Message || payload.message || "Failed to fetch users",
@@ -188,13 +208,77 @@ const UserIndex = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUsers(currentPage, debouncedSearchQuery);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, debouncedSearchQuery]);
+  // Fetch filter dropdowns
+  const fetchFilterCountries = async () => {
+    try {
+      const res = await axiosInstance.get("/countries");
+      const payload = res.data || {};
+      setFilterCountries(payload.data || payload.countries || []);
+    } catch (err) {
+      console.error("Filter country fetch error:", err);
+    }
+  };
+
+  const fetchFilterStates = async () => {
+    try {
+      const res = await axiosInstance.get("/states");
+      const payload = res.data || {};
+      setFilterStates(payload.data || payload.states || []);
+    } catch (err) {
+      console.error("Filter state fetch error:", err);
+      setFilterStates([]);
+    }
+  };
+
+  const fetchFilterCities = async () => {
+    try {
+      const res = await axiosInstance.get("/cities");
+      const payload = res.data || {};
+      setFilterCities(payload.data || payload.cities || []);
+    } catch (err) {
+      console.error("Filter city fetch error:", err);
+      setFilterCities([]);
+    }
+  };
+
+  const fetchFilterAreas = async () => {
+    try {
+      const res = await axiosInstance.get("/areas");
+      const payload = res.data || {};
+      setFilterAreas(payload.data || payload.areas || []);
+    } catch (err) {
+      console.error("Filter area fetch error:", err);
+      setFilterAreas([]);
+    }
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      countryId: "",
+      stateId: "",
+      cityId: "",
+      areaId: "",
+    });
+    setCurrentPage(1);
+  };
 
   useEffect(() => {
+    fetchUsers(currentPage, debouncedSearchQuery, filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, debouncedSearchQuery, filters]);
+
+  // Load all filter dropdowns on mount
+  useEffect(() => {
     fetchCountries();
+    fetchFilterCountries();
+    fetchFilterStates();
+    fetchFilterCities();
+    fetchFilterAreas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -406,7 +490,7 @@ const UserIndex = () => {
         if ((responsePayload.Status ?? responsePayload.status) === 1) {
           toastSuccess(responsePayload.Message || "User updated successfully");
           closeModal();
-          fetchUsers(1, debouncedSearchQuery);
+          fetchUsers(1, debouncedSearchQuery, filters);
         } else {
           toastError(responsePayload.Message || "Failed to update user");
         }
@@ -538,22 +622,39 @@ const UserIndex = () => {
         <>
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h3>Manage Users</h3>
-            <div className="d-flex gap-2">
-              <button className="btn btn-primary" onClick={openAddModal}>
-                Add New User
+            <div className="d-flex align-items-center gap-2">
+                <button
+                className="btn btn-outline-secondary"
+                onClick={() => setShowFilter(!showFilter)}
+              >
+                {showFilter ? "Hide Filter" : "Show Filter"}
               </button>
+              <input
+                type="text"
+                className="form-control"
+                style={{ width: "280px" }}
+                placeholder="Search users by name, email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            
             </div>
           </div>
 
-          <div className="mb-3">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search users by name, email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+          {showFilter && (
+            <CommonFilter
+              filters={filters}
+              dropdowns={{
+                countryId: filterCountries,
+                stateId: filterStates,
+                cityId: filterCities,
+                areaId: filterAreas,
+              }}
+              onFilterChange={handleFilterChange}
+              onClearFilters={handleClearFilters}
+              filtersToShow={["countryId", "stateId", "cityId", "areaId"]}
             />
-          </div>
+          )}
 
           {loading ? (
             <div className="text-center py-5">
@@ -563,10 +664,12 @@ const UserIndex = () => {
             </div>
           ) : (
             <>
-              {isSuperAdmin && (
+                {/* {isSuperAdmin && (
                 <div className="mb-2 text-muted">Total Users: {totalUsers}</div>
-              )}
+              )}*/}
               <CommonTable
+                title="User List"
+                addLabel="+ Add User"
                 columns={[
                   { label: "Name", key: "firstName" },
                   { label: "Email", key: "email" },
@@ -591,6 +694,7 @@ const UserIndex = () => {
                   }
                   handleEditUser(user);
                 }}
+                onAdd={openAddModal}
                 onDelete={handleDeleteUser}
                 rowKey="_id"
               />

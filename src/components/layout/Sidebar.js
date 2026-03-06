@@ -24,12 +24,11 @@ const Sidebar = () => {
               Manage User
             </NavLink>
 
-            <NavLink to="/tree-list" className={navClass}>
-              Tree List
-            </NavLink>
-
             <NavLink to="/manage-plantation/assignments" className={navClass}>
               Tree Assignments
+            </NavLink>
+            <NavLink to="/tree-detail" className={navClass}>
+              Tree Detail
             </NavLink>
           </>
         )}
@@ -42,6 +41,9 @@ const Sidebar = () => {
 
             <NavLink to="/tree-detail" className={navClass}>
               Tree Detail
+            </NavLink>
+            <NavLink to="/groupMember" className={navClass}>
+              Group Members
             </NavLink>
           </>
         )}

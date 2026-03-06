@@ -57,6 +57,10 @@ const CommonTable = ({
 
   // Simple key/value style: use column.key for data path and column.label for header
   const getCellValue = (row, column) => {
+    if (typeof column.render === "function") {
+      return column.render(row);
+    }
+
     const keyPath = column.key;
     const value =
       typeof keyPath === "string" ? getNestedValue(row, keyPath) : undefined;
@@ -64,6 +68,18 @@ const CommonTable = ({
     if (column.valueMap && value !== undefined && value !== null) {
       const mappedValue = column.valueMap[String(value)];
       if (mappedValue !== undefined) return mappedValue;
+    }
+
+    if (typeof value === "object" && value !== null) {
+      if (typeof value.name === "string") return value.name;
+      if (
+        typeof value.firstName === "string" &&
+        typeof value.lastName === "string"
+      ) {
+        return `${value.firstName} ${value.lastName}`.trim();
+      }
+      if (typeof value.firstName === "string") return value.firstName;
+      return "-";
     }
 
     return value ?? "-";
