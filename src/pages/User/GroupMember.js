@@ -12,11 +12,6 @@ const GroupMembers = () => {
   const [groupName, setGroupName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    fetchGroupMembers();
-  }, []);
-
   const fetchGroupMembers = async () => {
     setLoading(true);
     try {
@@ -24,6 +19,7 @@ const GroupMembers = () => {
 
       if (!userAreaId) {
         toastError("Area information not found in user profile");
+        setLoading(false);
         return;
       }
 
@@ -36,6 +32,7 @@ const GroupMembers = () => {
         if (!group) {
           toastError("No group found for your area");
           setMembers([]);
+          setLoading(false);
           return;
         }
 
@@ -68,6 +65,11 @@ const GroupMembers = () => {
     }
   };
 
+  useEffect(() => {
+    fetchGroupMembers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps  
+  }, []);
+
   const columns = [
     {
       label: "Member Name",
@@ -76,7 +78,7 @@ const GroupMembers = () => {
         `${row.firstName || ""} ${row.lastName || ""}`.trim() || "-",
     },
     { label: "Email", key: "email" },
-    { label: "Phone", key: "phone" },
+    { label: "Phone", key: "phoneNo" },
     {
       label: "Country",
       key: "country",
@@ -100,7 +102,6 @@ const GroupMembers = () => {
         <h2 className="fw-bold">
           {groupName ? `${groupName} - Group Members` : "Group Members"}
         </h2>
-        <p className="text-muted">View all members in your area&apos;s group</p>
       </div>
 
       {members.length === 0 && !loading && (

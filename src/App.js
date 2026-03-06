@@ -26,7 +26,7 @@ import StateManager from "./pages/Master/StateMaster/StateMaster";
 import CityMaster from "./pages/Master/CityMaster/CityMaster";
 import AreaManager from "./pages/Master/AreaMaster/AreaMaster";
 import TreenameManager from "./pages/Master/TreenameMaster/TreenameMaster";
-import ViewTreeList from "./pages/Admin/manage-plantation/ViewTreeList";
+//import ViewTreeList from "./pages/Admin/manage-plantation/ViewTreeList";
 import ViewTreeDetail from "./pages/User/Manage-Tree/TreeDetailIndex";
 import ViewTask from "./pages/User/Manage-Tree/ViewTask";
 import TreeProfile from "./pages/User/Manage-Tree/TreeProfile";
