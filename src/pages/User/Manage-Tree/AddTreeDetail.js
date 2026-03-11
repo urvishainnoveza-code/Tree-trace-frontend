@@ -40,7 +40,7 @@ const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
         state: initialData.assign?.state?.name || "",
         city: initialData.assign?.city?.name || "",
         area: initialData.assign?.area?.name || "",
-        address: initialData.address || "",
+        address: initialData.assign?.address?.name || "",
         plantedCount: initialData.plantedCount || "",
         cage: initialData.cage ? "Yes" : "No",
         watering: initialData.watering ? "Yes" : "No",
@@ -61,6 +61,7 @@ const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
         state: initialData.state || "",
         city: initialData.city || "",
         area: initialData.area || "",
+        address: initialData.address || "",
         images: [],
       }));
       setExistingImages([]);
@@ -87,8 +88,8 @@ const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
       label: "Address",
       name: "address",
       type: "textarea",
-      required: true,
-      placeholder: "Enter plantation address",
+      disabled: isEditMode,
+      placeholder: "Address:(near yogi banglos, sector 137, noida)",
     },
     {
       label: "Planted Count",
@@ -97,6 +98,7 @@ const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
       required: true,
       min: 1,
       placeholder: "Number of trees planted",
+      disabled: isEditMode, // Disable field if editing
     },
     {
       label: "Cage",
@@ -191,87 +193,122 @@ const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
   };
 
   const handleSubmit = async () => {
-    try {
-      setLoading(true);
+    setLoading(true);
+    const {
+      assignmentId,
+      plantedCount,
+      cage,
+      watering,
+      fertilizer,
+      ...otherData
+    } = formData;
 
-      const {
-        assignmentId,
-        plantedCount,
-        cage,
-        watering,
-        fertilizer,
-        ...otherData
-      } = formData;
-
-      if (!assignmentId) {
-        toastError("Assignment ID is missing");
-        return;
-      }
-
-      if (!plantedCount || plantedCount <= 0) {
-        toastError("Planted count must be greater than 0");
-        return;
-      }
-
-      const formDataObj = new FormData();
-      formDataObj.append("assign", assignmentId);
-      formDataObj.append("address", otherData.address);
-      formDataObj.append("plantedCount", plantedCount);
-      formDataObj.append("cage", cage === "Yes" ? "true" : "false");
-      formDataObj.append("watering", watering === "Yes" ? "true" : "false");
-      formDataObj.append("fertilizer", fertilizer === "Yes" ? "true" : "false");
-      formDataObj.append("fertilizerDetail", otherData.fertilizerDetail);
-      formDataObj.append("healthStatus", otherData.healthStatus);
-
-      if (formData.images && formData.images.length > 0) {
-        formData.images.forEach((image) => {
-          formDataObj.append("images", image);
-        });
-      }
-
-      let response;
-      if (isEditMode) {
-        // Update existing plantation
-        response = await axiosInstance.put(
-          `/plantation/${initialData._id}`,
-          formDataObj,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          },
-        );
-      } else {
-        // Create new plantation
-        response = await axiosInstance.post("/plantation", formDataObj, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-      }
-
-      if (response.data?.Status === 1) {
-        toastSuccess(
-          response.data?.Message ||
-            `Tree plantation ${isEditMode ? "updated" : "created"} successfully`,
-        );
-        onSaved(response.data?.Plantation);
-        onClose();
-      } else {
-        toastError(
-          response.data?.Message ||
-            `Failed to ${isEditMode ? "update" : "create"} plantation`,
-        );
-      }
-    } catch (error) {
-      toastError(
-        error.response?.data?.Message ||
-          `Error ${isEditMode ? "updating" : "creating"} tree plantation`,
-      );
-      console.error("Plantation Error:", error);
-    } finally {
+    if (!assignmentId) {
+      toastError("Assignment ID is missing");
       setLoading(false);
+      return;
     }
+
+    if (!plantedCount || plantedCount <= 0) {
+      toastError("Planted count must be greater than 0");
+      setLoading(false);
+      return;
+    }
+
+    // Always fetch latest location for plantation (never use login or localStorage location)
+    if (!("geolocation" in navigator)) {
+      toastError("Geolocation is not supported in this browser.");
+      setLoading(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          // Use only fresh coordinates for plantation
+          const userLat = Number(position.coords.latitude.toFixed(6));
+          const userLng = Number(position.coords.longitude.toFixed(6));
+          const formDataObj = new FormData();
+          formDataObj.append("assign", assignmentId);
+          formDataObj.append("address", otherData.address);
+          formDataObj.append("plantedCount", plantedCount);
+          formDataObj.append("cage", cage === "Yes" ? "true" : "false");
+          formDataObj.append("watering", watering === "Yes" ? "true" : "false");
+          formDataObj.append(
+            "fertilizer",
+            fertilizer === "Yes" ? "true" : "false",
+          );
+          formDataObj.append("fertilizerDetail", otherData.fertilizerDetail);
+          formDataObj.append("healthStatus", otherData.healthStatus);
+
+          if (formData.images && formData.images.length > 0) {
+            formData.images.forEach((image) => {
+              formDataObj.append("images", image);
+            });
+          }
+
+          formDataObj.append("latitude", userLat);
+          formDataObj.append("longitude", userLng);
+
+          let response;
+          if (isEditMode) {
+            response = await axiosInstance.put(
+              `/plantation/${initialData._id}`,
+              formDataObj,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              },
+            );
+          } else {
+            response = await axiosInstance.post("/plantation", formDataObj, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            });
+          }
+
+          if (response.data?.Status === 1) {
+            toastSuccess(
+              response.data?.Message ||
+                `Tree plantation ${isEditMode ? "updated" : "created"} successfully`,
+            );
+            onSaved(response.data?.Plantation);
+            onClose();
+          } else {
+            toastError(
+              response.data?.Message ||
+                `Failed to ${isEditMode ? "update" : "create"} plantation`,
+            );
+          }
+        } catch (error) {
+          // Handle Axios errors and show backend message if available
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.Message
+          ) {
+            toastError(error.response.data.Message);
+          } else if (error.response && error.response.status === 400) {
+            toastError("Bad request. Please check your input and try again.");
+          } else {
+            toastError("An unexpected error occurred. Please try again.");
+          }
+        } finally {
+          setLoading(false);
+        }
+      },
+      (error) => {
+        toastError("Failed to fetch location. Please allow access.");
+        setLoading(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      },
+    );
   };
 
   return (

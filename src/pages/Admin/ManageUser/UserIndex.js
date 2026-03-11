@@ -624,7 +624,7 @@ const UserIndex = () => {
             <h3>Manage Users</h3>
             <div className="d-flex align-items-center gap-2">
                 <button
-                className="btn btn-outline-secondary"
+                className="btn btn-sm btn-primary"
                 onClick={() => setShowFilter(!showFilter)}
               >
                 {showFilter ? "Hide Filter" : "Show Filter"}

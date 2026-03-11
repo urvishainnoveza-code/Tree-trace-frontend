@@ -184,7 +184,7 @@ const CommonTable = ({
                             <>
                               {onView && (
                                 <button
-                                  className="btn btn-sm btn-outline-info"
+                                  className="btn btn-sm btn-info"
                                   onClick={() => onView(row)}
                                 >
                                   View
@@ -192,7 +192,7 @@ const CommonTable = ({
                               )}
                               {onEdit && (
                                 <button
-                                  className="btn btn-sm btn-outline-warning"
+                                  className="btn btn-sm btn-warning"
                                   onClick={() => onEdit(row)}
                                 >
                                   Edit
@@ -200,7 +200,7 @@ const CommonTable = ({
                               )}
                               {onDelete && (
                                 <button
-                                  className="btn btn-sm btn-outline-danger"
+                                  className="btn btn-sm btn-danger"
                                   onClick={() => onDelete(row)}
                                 >
                                   Delete

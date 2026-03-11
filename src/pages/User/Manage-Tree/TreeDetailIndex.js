@@ -51,30 +51,15 @@ const ViewTreeDetail = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.get("/plantation");
-
       if (response.data?.Status === 1) {
         const plantations = response.data?.Plantation || [];
-
-        const visiblePlantations =
-          userType === "superAdmin" || !currentUser?._id
-            ? plantations
-            : plantations.filter((p) => {
-                const plantedById =
-                  typeof p.plantedBy === "string"
-                    ? p.plantedBy
-                    : p.plantedBy?._id;
-                return (
-                  plantedById && String(plantedById) === String(currentUser._id)
-                );
-              });
-
-        setTreeDetail(visiblePlantations);
-        setAllTreeDetail(visiblePlantations);
+        setTreeDetail(plantations);
+        setAllTreeDetail(plantations);
 
         // Build unique dropdown options
         const uniqueTrees = [
           ...new Map(
-            visiblePlantations
+            plantations
               .filter((p) => p.assign?.treeName?._id)
               .map((p) => [
                 p.assign.treeName._id,
@@ -85,7 +70,7 @@ const ViewTreeDetail = () => {
 
         const uniqueStates = [
           ...new Map(
-            visiblePlantations
+            plantations
               .filter((p) => p.assign?.state?._id)
               .map((p) => [
                 p.assign.state._id,
@@ -96,7 +81,7 @@ const ViewTreeDetail = () => {
 
         const uniqueCities = [
           ...new Map(
-            visiblePlantations
+            plantations
               .filter((p) => p.assign?.city?._id)
               .map((p) => [
                 p.assign.city._id,
@@ -107,7 +92,7 @@ const ViewTreeDetail = () => {
 
         const uniqueAreas = [
           ...new Map(
-            visiblePlantations
+            plantations
               .filter((p) => p.assign?.area?._id)
               .map((p) => [
                 p.assign.area._id,
@@ -188,8 +173,52 @@ const ViewTreeDetail = () => {
     setShowEdit(true);
   };
 
-  const handleEditSaved = (updatedPlantation) => {
-    fetchPlantations();
+  // Enhanced edit save handler for proximity fields
+  const handleEditSaved = (updatedPlantation, editData) => {
+    // Check if proximity fields are being edited
+    const proximityFields = [
+      "cage",
+      "watering",
+      "fertilizer",
+      "fertilizerDetail",
+      "images",
+    ];
+    const isProximityEdit = proximityFields.some(
+      (field) => editData && editData[field] !== undefined,
+    );
+    if (isProximityEdit) {
+      // Get user location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            // Send edit request with location
+            axiosInstance
+              .put(`/plantation/${updatedPlantation._id}`, {
+                ...editData,
+                latitude,
+                longitude,
+              })
+              .then(() => {
+                fetchPlantations();
+                toastError("Edit successful.");
+              })
+              .catch((error) => {
+                toastError(
+                  error.response?.data?.Message || "Error updating plantation",
+                );
+              });
+          },
+          (error) => {
+            toastError("Location permission denied or unavailable.");
+          },
+        );
+      } else {
+        toastError("Geolocation not supported by your browser.");
+      }
+    } else {
+      fetchPlantations();
+    }
   };
 
   const columns = [
@@ -252,6 +281,22 @@ const ViewTreeDetail = () => {
       },
     },
     { label: "Age", key: "age" },
+    {
+      label: "Last Watered",
+      key: "lastWateredDate",
+      render: (row) =>
+        row.lastWateredDate
+          ? new Date(row.lastWateredDate).toLocaleString()
+          : "-",
+    },
+    {
+      label: "Last Fertilizer",
+      key: "lastFertilizerDate",
+      render: (row) =>
+        row.lastFertilizerDate
+          ? new Date(row.lastFertilizerDate).toLocaleString()
+          : "-",
+    },
     {
       label: "Plantation Date",
       key: "plantationDate",

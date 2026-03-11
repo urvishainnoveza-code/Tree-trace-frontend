@@ -32,7 +32,7 @@ const CommonModel = ({
     return (
       <>
         <button
-          className="btn btn-secondary"
+          className="btn btn-success"
           onClick={onClose}
           disabled={isSaving}
         >
@@ -40,7 +40,7 @@ const CommonModel = ({
         </button>
         {onSave && (
           <button
-            className="btn btn-primary"
+            className="btn btn-success"
             onClick={onSave}
             disabled={isSaving}
           >

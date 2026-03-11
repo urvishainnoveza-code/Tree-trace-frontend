@@ -24,9 +24,21 @@ const Header = () => {
   const dropdownRef = useRef(null);
 
   const handleLogout = () => {
+    localStorage.removeItem("auth");
+    localStorage.removeItem("checkRole");
+    localStorage.removeItem("email");
+    localStorage.removeItem("firstName");
+    localStorage.removeItem("lastName");
+    localStorage.removeItem("profilepic");
     localStorage.removeItem("token");
     localStorage.removeItem("userType");
     localStorage.removeItem("user");
+    localStorage.removeItem("role");
+    localStorage.removeItem("roleId");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userLat");
+    localStorage.removeItem("userLng");
 
     navigate(userType === "superAdmin" ? "/" : "/user-login");
   };
