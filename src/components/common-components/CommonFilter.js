@@ -103,13 +103,7 @@ const CommonFilter = ({
             />
           ) : null}
           {/* Date Fields */}
-          {key === "date" || key === "startDate" || key === "endDate" ? (
-            <input
-              type="date"
-              value={selectedFilters[key]}
-              onChange={(e) => handleChange(key, e.target.value)}
-            />
-          ) : null}
+          
         </div>
       ))}
 

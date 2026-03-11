@@ -137,10 +137,22 @@ const TreeProfile = () => {
             <div className="col-md-3">
               <h6 className="text-muted">Watering</h6>
               <p>{tree.watering ? "Yes" : "No"}</p>
+              {tree.lastWateredDate && (
+                <small className="text-muted">
+                  Last Watered:{" "}
+                  {new Date(tree.lastWateredDate).toLocaleString()}
+                </small>
+              )}
             </div>
             <div className="col-md-3">
               <h6 className="text-muted">Fertilizer</h6>
               <p>{tree.fertilizer ? "Yes" : "No"}</p>
+              {tree.lastFertilizerDate && (
+                <small className="text-muted">
+                  Last Fertilizer:{" "}
+                  {new Date(tree.lastFertilizerDate).toLocaleString()}
+                </small>
+              )}
             </div>
             <div className="col-md-3">
               <h6 className="text-muted">Age</h6>
@@ -170,7 +182,11 @@ const TreeProfile = () => {
                 {tree.images.map((imgPath, index) => (
                   <img
                     key={`${imgPath}-${index}`}
-                    src={`${axiosInstance.defaults.baseURL}${imgPath}`}
+                    src={
+                      imgPath.startsWith("http")
+                        ? imgPath
+                        : `${axiosInstance.defaults.baseURL}${imgPath}`
+                    }
                     alt={`tree-${index}`}
                     style={{
                       width: "120px",

@@ -33,6 +33,7 @@ function Login() {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         });
+        // Do NOT store location in localStorage. Only use live GPS for login validation.
       },
       (error) => {
         toastError("Please allow location access to continue.");
@@ -75,7 +76,10 @@ function Login() {
     e.preventDefault();
 
     if (!locationAllowed || !coords.latitude || !coords.longitude) {
-      toastError("Location not available. Please allow location access.");
+      toastError(
+        "Location not available. Please allow location access and refresh the page. If you still see this, check your browser settings or contact support.",
+      );
+      console.log("Login attempt without location:", coords);
       return;
     }
 
@@ -109,6 +113,7 @@ function Login() {
       } else if (Status === 1) {
         const { UserToken, user } = res.data;
         setAuth(UserToken, user);
+        // Do NOT store location for later use. Only use live GPS for login validation.
         toastSuccess("Login successful!");
         setTimeout(
           () =>
@@ -174,6 +179,30 @@ function Login() {
     }
   };
 
+  // Add a manual location refresh button for professional user experience
+  {
+    /*const handleLocationRefresh = () => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCoords({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          localStorage.setItem("userLat", position.coords.latitude);
+          localStorage.setItem("userLng", position.coords.longitude);
+          toastSuccess("Location refreshed!");
+        },
+        (error) => {
+          toastError("Failed to refresh location. Please allow access.");
+        },
+      );
+    } else {
+      toastError("Geolocation is not supported in this browser.");
+    }
+  };*/
+  }
+
   return (
     <div className="auth-container">
       <div className="auth-card">
@@ -226,7 +255,13 @@ function Login() {
                   <button
                     type="submit"
                     className="auth-btn-primary"
-                    disabled={isSubmitting || !email}
+                    disabled={
+                      isSubmitting ||
+                      !email ||
+                      !coords.latitude ||
+                      !coords.longitude ||
+                      locationAllowed !== true
+                    }
                   >
                     {isSubmitting ? "Checking..." : "Continue"}
                   </button>
@@ -245,6 +280,16 @@ function Login() {
                       </button>
                     </p>
                   </div>
+
+                  {/* Refresh Location button can be removed or kept for fallback, but is no longer required */}
+                  {/* <button
+                    type="button"
+                    className="auth-btn-secondary"
+                    onClick={handleLocationRefresh}
+                    disabled={isSubmitting}
+                  >
+                    Refresh Location
+                  </button> */}
                 </form>
               ) : (
                 // PASSWORD FORM (SuperAdmin)

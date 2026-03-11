@@ -1,0 +1,36 @@
+.dashboard-card {
+  background: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  min-width: 180px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.dashboard-card .card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.dashboard-card .card-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.dashboard-card .card-value {
+  font-size: 32px;
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.dashboard-card.total .card-value {
+  color: #1976d2;
+}
+
+.dashboard-card.planted .card-value {
+  color: #388e3c;
+}
