@@ -35,6 +35,22 @@ const ViewAssignments = () => {
   const [filterCities, setFilterCities] = useState([]);
   const [filterAreas, setFilterAreas] = useState([]);
   const [filterTrees, setFilterTrees] = useState([]);
+  // Prepare dropdowns for CommonFilter
+  const dropdowns = {
+    countryId: { label: "Country", options: Array.isArray(filterCountries) ? filterCountries : [] },
+    stateId: { label: "State", options: Array.isArray(filterStates) ? filterStates : [] },
+    cityId: { label: "City", options: Array.isArray(filterCities) ? filterCities : [] },
+    areaId: { label: "Area", options: Array.isArray(filterAreas) ? filterAreas : [] },
+    treeId: { label: "Tree", options: Array.isArray(filterTrees) ? filterTrees : [] },
+    status: {
+      label: "Status",
+      options: [
+        { _id: "assigned", name: "Assigned" },
+        { _id: "completed", name: "Completed" },
+        { _id: "cancelled", name: "Cancelled" },
+      ],
+    },
+  };
 
   // Debounce search
   useEffect(() => {
