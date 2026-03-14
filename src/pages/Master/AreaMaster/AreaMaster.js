@@ -466,16 +466,26 @@ const AreaManager = () => {
 
   return (
     <div className="p-4">
-      {/* Header with Search */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3 className="mb-0">Area Management</h3>
-        <input
-          type="text"
-          className="form-control w-25"
-          placeholder="Search areas (min 3 chars)..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      {/* Header with Add button and Search */}
+      <div className="mb-3">
+        <div className="d-flex justify-content-between align-items-center">
+          <h3 className="mb-0 commonindex-26">Area Management</h3>
+          <button
+            className="btn btn-success add-user-btn common-index-font14"
+            onClick={handleAddClick}
+          >
+            + Add Area
+          </button>
+        </div>
+        <div className="d-flex align-items-center gap-2 mt-2">
+          <input
+            type="text"
+            className="form-control common-search-input common-index-font14"
+            placeholder="Search areas (min 3 chars)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
       {/* Loading State */}

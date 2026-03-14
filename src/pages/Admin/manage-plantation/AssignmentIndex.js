@@ -6,7 +6,7 @@ import { toastSuccess, toastError } from "../../../utils/alertHelper";
 import CommonTable from "../../../components/common-components/CommonTable";
 import CommonFilter from "../../../components/common-components/CommonFilter";
 
-const ViewAssignments = () => {
+const AssignmentIndex = () => {
   const navigate = useNavigate();
   const userType = getUserType();
   const isSuperAdmin = userType === "superAdmin";
@@ -17,40 +17,22 @@ const ViewAssignments = () => {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalRecords, setTotalRecords] = useState(0);
+  // Removed unused totalRecords state
   const limit = parseInt(process.env.REACT_APP_PAGE_LIMIT || 10);
 
   // Filter states
-  const [showFilter, setShowFilter] = useState(false);
   const [filters, setFilters] = useState({
     countryId: "",
     stateId: "",
     cityId: "",
     areaId: "",
     treeId: "",
-    status: "",
   });
   const [filterCountries, setFilterCountries] = useState([]);
   const [filterStates, setFilterStates] = useState([]);
   const [filterCities, setFilterCities] = useState([]);
   const [filterAreas, setFilterAreas] = useState([]);
   const [filterTrees, setFilterTrees] = useState([]);
-  // Prepare dropdowns for CommonFilter
-  const dropdowns = {
-    countryId: { label: "Country", options: Array.isArray(filterCountries) ? filterCountries : [] },
-    stateId: { label: "State", options: Array.isArray(filterStates) ? filterStates : [] },
-    cityId: { label: "City", options: Array.isArray(filterCities) ? filterCities : [] },
-    areaId: { label: "Area", options: Array.isArray(filterAreas) ? filterAreas : [] },
-    treeId: { label: "Tree", options: Array.isArray(filterTrees) ? filterTrees : [] },
-    status: {
-      label: "Status",
-      options: [
-        { _id: "assigned", name: "Assigned" },
-        { _id: "completed", name: "Completed" },
-        { _id: "cancelled", name: "Cancelled" },
-      ],
-    },
-  };
 
   // Debounce search
   useEffect(() => {
@@ -81,14 +63,12 @@ const ViewAssignments = () => {
         if (filters.cityId) params.city = filters.cityId;
         if (filters.areaId) params.area = filters.areaId;
         if (filters.treeId) params.treeName = filters.treeId;
-        if (filters.status) params.status = filters.status;
 
         const res = await axiosInstance.get("/assign", { params });
 
         if (res.data.Status === 1) {
           setAssignments(res.data.data || res.data.Data || []);
           setTotalPages(res.data.TotalPages || res.data.totalPages || 1);
-          setTotalRecords(res.data.TotalRecords || res.data.totalRecords || 0);
         } else {
           setAssignments([]);
         }
@@ -183,7 +163,6 @@ const ViewAssignments = () => {
       cityId: "",
       areaId: "",
       treeId: "",
-      status: "",
     });
     setCurrentPage(1);
   };
@@ -256,46 +235,48 @@ const ViewAssignments = () => {
       {isSuperAdmin && (
         <>
           <div className="d-flex justify-content-between align-items-center mb-3">
-            <h3>Tree Assignments</h3>
-            <div className="d-flex align-items-center gap-2">
-              <button
-                className="btn btn-sm btn-primary"
-                onClick={() => setShowFilter(!showFilter)}
-              >
-                {showFilter ? "Hide Filter" : "Show Filter"}
-              </button>
+            <h3 className="commonindex-24">Tree Assignments</h3>
+            <button
+              className="btn btn-success add-btn common-index-font14"
+              onClick={() => navigate("/manage-plantation/assign")}
+            >
+              + Assign Trees
+            </button>
+          </div>
+          <div className="d-flex align-items-center gap-2 mb-3 flex-nowrap">
+            <div className="d-flex align-items-center gap-2 flex-nowrap w-100">
               <input
                 type="text"
-                className="form-control"
-                style={{ width: "280px" }}
+                className="form-control common-search-input common-index-font14"
                 placeholder="Search assignments..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ width: 220, minWidth: 180, fontSize: 14 }}
+              />
+              <CommonFilter
+                filters={filters}
+                dropdowns={{
+                  countryId: filterCountries,
+                  stateId: filterStates,
+                  cityId: filterCities,
+                  areaId: filterAreas,
+                  treeId: filterTrees,
+                }}
+                onFilterChange={handleFilterChange}
+                onClearFilters={handleClearFilters}
+                filtersToShow={[
+                  "countryId",
+                  "stateId",
+                  "cityId",
+                  "areaId",
+                  "treeId",
+                ]}
+                inputClassName="common-filter-select common-index-font14"
+                selectClassName="common-filter-select common-index-font14"
+                buttonClassName="common-filter-btn common-index-font14"
               />
             </div>
           </div>
-
-          {showFilter && (
-            <CommonFilter
-              filters={filters}
-              dropdowns={{
-                countryId: filterCountries,
-                stateId: filterStates,
-                cityId: filterCities,
-                areaId: filterAreas,
-                treeId: filterTrees,
-              }}
-              onFilterChange={handleFilterChange}
-              onClearFilters={handleClearFilters}
-              filtersToShow={[
-                "countryId",
-                "stateId",
-                "cityId",
-                "areaId",
-                "treeId",
-              ]}
-            />
-          )}
         </>
       )}
 
@@ -315,13 +296,8 @@ const ViewAssignments = () => {
           limit,
         }}
       />
-
-      {/* Summary */}
-      <div className="mt-2 text-muted">
-        Showing {assignments.length} of {totalRecords} assignments
-      </div>
     </div>
   );
 };
 
-export default ViewAssignments;
+export default AssignmentIndex;

@@ -11,6 +11,17 @@ const GroupMembers = () => {
   const [members, setMembers] = useState([]);
   const [groupName, setGroupName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.length >= 3 || searchQuery.length === 0) {
+        setDebouncedSearchQuery(searchQuery);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const fetchGroupMembers = async () => {
     setLoading(true);
@@ -67,7 +78,7 @@ const GroupMembers = () => {
 
   useEffect(() => {
     fetchGroupMembers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps  
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const columns = [
@@ -96,15 +107,35 @@ const GroupMembers = () => {
     },
   ];
 
+  const filteredMembers = React.useMemo(() => {
+    if (!debouncedSearchQuery) return members;
+    const query = debouncedSearchQuery.toLowerCase();
+    return members.filter(
+      (m) =>
+        m.firstName?.toLowerCase().includes(query) ||
+        m.lastName?.toLowerCase().includes(query) ||
+        m.email?.toLowerCase().includes(query),
+    );
+  }, [members, debouncedSearchQuery]);
+
   return (
     <div className="p-4">
       <div className="mb-3">
-        <h2 className="fw-bold">
+        <h2 className="commonindex-24">
           {groupName ? `${groupName} - Group Members` : "Group Members"}
         </h2>
       </div>
-
-      {members.length === 0 && !loading && (
+      <div className="d-flex align-items-center gap-2 mb-3 flex-nowrap">
+        <input
+          type="text"
+          className="form-control common-search-input common-index-font14"
+          placeholder="Search by name or email..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{ width: 220, minWidth: 180, fontSize: 14 }}
+        />
+      </div>
+      {filteredMembers.length === 0 && !loading && (
         <div className="alert alert-info">
           No group members found for your area
         </div>
@@ -113,7 +144,7 @@ const GroupMembers = () => {
       <CommonTable
         title="Member List"
         columns={columns}
-        data={members}
+        data={filteredMembers}
         loading={loading}
         onView={(row) => navigate(`/user-profile/${row._id}`)}
       />

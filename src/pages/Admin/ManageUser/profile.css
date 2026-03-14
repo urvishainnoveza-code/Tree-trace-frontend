@@ -1,0 +1,101 @@
+.profile-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 900px;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  background: #fff;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.profile-image {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-placeholder {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid #206a37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #206a37;
+  background: white;
+}
+
+.profile-info {
+  margin-left: 20px;
+  flex: 1;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-name {
+  margin: 0;
+  font-weight: 600;
+}
+
+.profile-phone {
+  margin-top: 5px;
+  font-size: 18px;
+  color: #555;
+  display: flex;
+  align-items: center;
+}
+
+.phone-icon {
+  margin-right: 8px;
+  font-size: 20px;
+}
+
+
+
+.profile-sections {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.profile-box {
+  flex: 1;
+  border: 1px solid #e3e6f0;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.profile-admin {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.admin-row {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.profile-loading {
+  text-align: center;
+  margin-top: 50px;
+}

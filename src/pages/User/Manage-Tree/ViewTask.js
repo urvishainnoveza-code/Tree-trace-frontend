@@ -10,7 +10,6 @@ import "../../../components/common-components/common.css";
 const ViewTask = () => {
   const [trees, setTrees] = useState([]);
   const [allTrees, setAllTrees] = useState([]);
-  const [showFilter, setShowFilter] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showAddTreeDetail, setShowAddTreeDetail] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -30,6 +29,9 @@ const ViewTask = () => {
     areaId: [],
     treeId: [],
   });
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
   const fetchUserTasks = async () => {
     setLoading(true);
@@ -187,6 +189,30 @@ const ViewTask = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.length >= 3 || searchQuery.length === 0) {
+        setDebouncedSearch(searchQuery);
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (debouncedSearch.trim().length === 0) {
+      setTrees(allTrees);
+    } else {
+      const searchLower = debouncedSearch.trim().toLowerCase();
+      setTrees(
+        allTrees.filter(
+          (t) =>
+            t.treeName?.name &&
+            t.treeName.name.toLowerCase().includes(searchLower),
+        ),
+      );
+    }
+  }, [debouncedSearch, allTrees]);
+
   const handleFilterChange = (selectedFilters) => {
     setFilters(selectedFilters);
 
@@ -235,18 +261,17 @@ const ViewTask = () => {
   return (
     <div className="p-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="fw-bold">Tree List</h2>
-
-        <button
-          className="btn btn-sm btn-primary"
-          onClick={() => setShowFilter((prev) => !prev)}
-        >
-          {showFilter ? "Hide Filter" : "Show Filter"}
-        </button>
+        <h3 className="commonindex-24">Assign Task</h3>
       </div>
-
-      {/* Filter Section */}
-      {showFilter && (
+      <div className="d-flex align-items-center gap-2 mb-3 flex-nowrap">
+        <input
+          type="text"
+          className="form-control common-search-input common-index-font14"
+          placeholder="Search tasks..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{ width: 220, minWidth: 180, fontSize: 14 }}
+        />
         <CommonFilter
           filters={filters}
           dropdowns={dropdowns}
@@ -254,7 +279,7 @@ const ViewTask = () => {
           onFilterChange={handleFilterChange}
           onClearFilters={handleClearFilters}
         />
-      )}
+      </div>
 
       {/* Table */}
       <CommonTable

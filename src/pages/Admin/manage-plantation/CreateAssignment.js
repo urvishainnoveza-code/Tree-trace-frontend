@@ -342,7 +342,9 @@ const CreateAssignment = () => {
       label: "State",
       type: "select",
       options: states.map((s) => ({ value: s._id, label: s.name })),
+      required: true,
       disabled: !formData.country,
+
     },
     {
       name: "city",
@@ -379,6 +381,7 @@ const CreateAssignment = () => {
       name: "address",
       label: "Address",
       type: "textarea",
+      required: true,
     },
   ];
 

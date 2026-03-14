@@ -3,7 +3,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import { getUser } from "../../utils/auth";
 
 function UserDashboard() {
-  const [groups, setGroups] = useState([]);
+  // Removed unused groups state
   const [dashboardData, setDashboardData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -27,7 +27,6 @@ function UserDashboard() {
         userGroups = userGroups.filter(
           (g) => g.users && g.users.some((u) => u._id === userId),
         );
-        setGroups(userGroups);
 
         //Fetch all assignments
         const assignRes = await axiosInstance.get("/assign");
@@ -103,7 +102,7 @@ function UserDashboard() {
               <div className="col-md-4 col-12 mb-2">
                 <div className="card h-100 shadow-sm border-0">
                   <div className="card-body text-center">
-                    <div className="card-title fw-bold">Total Members</div>
+                    <div className="card-title fw-bold">Group Members</div>
                     <div className="display-6 text-primary">
                       {row.memberCount}
                     </div>

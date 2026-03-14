@@ -1,3 +1,75 @@
+/* Force Select2 single selection to 14px font size */
+.select2-container--default .select2-selection--single {
+  font-size: 14px !important;
+  font-family: inherit;
+}
+/* UserIndex page custom common styles */
+.add-btn {
+  min-width: 120px;
+  font-weight: 600;
+
+  border-radius: 8px;
+}
+.commonindex-26
+{
+  font-size: 26px;
+  font-weight: 600;
+}
+.common-index-font14 {
+  font-size: 14px !important;
+}
+
+  /* Ensure input and select font size matches .common-index-font14 */
+  input,
+  select {
+    font-size: 14px;
+    font-family: inherit;
+  }
+
+  /* Style placeholder text for input fields */
+  input::placeholder {
+    font-size: 14px;
+    font-family: inherit;
+    color: #888; /* Optional: match your design */
+    opacity: 1;  /* Ensure full opacity */
+  }
+
+  /* Style placeholder text for select (for some browsers) */
+  select:invalid {
+    color: #888; /* Optional: match your design */
+    font-size: 14px;
+    font-family: inherit;
+  }
+
+.user-count-card {
+  border-radius: 12px;
+}
+.user-count-label {
+  color: #6c757d;
+}
+.user-count-value {
+  font-weight: 700;
+  font-size: 24px;
+}
+.common-filter-item {
+  min-width: 40px!important;
+    width: 100px; /* or your desired fixed width */
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+}
+.common-search-input {
+  width: 220px;
+  min-width: 180px;
+  font-size: 14px;
+}
+.common-filter-select {
+  width: 100px;
+  font-size: 14px;
+}
+.common-filter-btn {
+  min-width: 80px;
+}
 /* Modal */
 .modal-overlay {
   position: fixed;
@@ -115,6 +187,10 @@
 .btn:hover{
   background-color: #29973a;
 }
+.btn-info:hover{
+  background-color: #0dcaf0;
+}
+
 
 .btn-secondary {
   background: #6b7280;
@@ -130,31 +206,6 @@
   padding: 30px;
   display: grid;
   gap: 12px;
-}
-
-.common-card {
-  border: 1px solid #ddd;
-  padding: 20px;
-  width: 180px;
-  text-align: center;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin: 10px;
-}
-
-.common-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.card-icon {
-  font-size: 24px;
-  color: #d4551d; 
-  margin-bottom: 8px;
-}
-
-.card-title {
-  font-weight: bold;
 }
 .card {
   border-radius: 8px;
@@ -187,13 +238,13 @@
 }
 
 .card-subtitle {
-  font-size: 0.9rem;
+  font-size: 14px;
   color: #6c757d;
 }
 
 .table {
   margin-bottom: 0;
-  font-size: 0.9rem;
+  font-size: 14px;
   table-layout: auto;
   width: 100% !important;
 }
@@ -231,24 +282,24 @@ td.d-flex {
   font-style: italic;
 }
 
-.btn-outline-warning {
+.btn-warning {
   border-color: #f0ad4e;
-  color: #f0ad4e;
-}
-
-.btn-outline-warning:hover {
-  background-color: #f0ad4e;
   color: #fff;
 }
 
-.btn-outline-danger {
+.btn-warning:hover {
+  background-color: #f0ad4e !important;
+  color: #fff !important;
+}
+
+.btn-danger {
   border-color: #dc3545;
-  color: #dc3545;
+  color: #fff;
 }
 
-.btn-outline-danger:hover {
-  background-color: #dc3545;
-  color: #fff;
+.btn-danger:hover {
+  background-color: #dc3545 !important;
+  color: #fff !important;
 }
 .btn-success:hover {
   background-color: #46914b !important;
@@ -292,7 +343,7 @@ td.d-flex {
 
 .modal-container {
   background: #fff;
-  width: 900px;
+  width: 500px;
   max-height: 90vh;
   border-radius: 8px;
   display: flex;
@@ -316,7 +367,7 @@ td.d-flex {
 }
 
 .section-title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   margin-bottom: 12px;
   border-bottom: 1px solid #ddd;
@@ -335,7 +386,7 @@ td.d-flex {
 }
 
 .form-group label {
-  font-size: 13px;
+  font-size: 14px;
   margin-bottom: 5px;
 }
 
@@ -348,7 +399,7 @@ td.d-flex {
 
 .error-text {
   color: red;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .modal-footer {
@@ -364,16 +415,20 @@ td.d-flex {
   border-radius: 19px;
   border: none;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.2;
   white-space: nowrap;
 }
 
-
 .btn.cancel {
   background: #989797;
-}
 
+  color: #fff;
+}
+.btn.cancel:hover {
+  background-color: #989797 !important;
+  color: #fff !important;
+}
 .btn.submit {
   background: #46914b;
   color: #fff;
@@ -388,54 +443,13 @@ td.d-flex {
 .radio-label {
   display: flex;
   gap: 6px;
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
 }
 
-.common-filter-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  align-items: flex-end;
-  background: #f8f9fa;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+.common-required-star {
+  color: #ed4c4c;
+  font-weight: bold;
+  margin-left: 2px;
 }
 
-.common-filter-item {
-  display: flex;
-  flex-direction: column;
-  min-width: 180px;
-}
-
-.common-filter-item label {
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.common-filter-item select,
-.common-filter-item input {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.common-filter-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.common-filter-button {
-  padding: 6px 14px;
-  border-radius: 6px;
-  border: none;
-  background: #29973a;
-  color: white;
-  cursor: pointer;
-}
-
-.common-filter-button.clear {
-  background: #6c757d;
-}

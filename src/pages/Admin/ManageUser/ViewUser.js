@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "../../../utils/axiosInstance";
+import "../../../components/common-components/common.css";
 
 const ViewUser = () => {
   const { id } = useParams();
@@ -308,7 +309,7 @@ const ViewUser = () => {
                     value={editData.country?._id || ""}
                     onChange={handleEditChange}
                   >
-                    <option value="">Select Country</option>
+                    <option value="" className="common-index-font14">Select Country</option>
                     {countries.map((c) => (
                       <option key={c._id} value={c._id}>
                         {c.name}

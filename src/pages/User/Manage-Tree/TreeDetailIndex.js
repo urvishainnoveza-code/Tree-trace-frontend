@@ -14,7 +14,6 @@ const ViewTreeDetail = () => {
   const [treeDetail, setTreeDetail] = useState([]);
   const [allTreeDetail, setAllTreeDetail] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showFilter, setShowFilter] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [selectedTreeDetail, setSelectedTreeDetail] = useState(null);
 
@@ -33,10 +32,20 @@ const ViewTreeDetail = () => {
     areaId: [],
   });
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   useEffect(() => {
     fetchPlantations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [debouncedSearch]);
 
   const toLocalDateInputValue = (dateValue) => {
     const parsedDate = new Date(dateValue);
@@ -50,7 +59,11 @@ const ViewTreeDetail = () => {
   const fetchPlantations = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get("/plantation");
+      const params = {};
+      if (debouncedSearch && debouncedSearch.trim().length > 0) {
+        params.search = debouncedSearch.trim();
+      }
+      const response = await axiosInstance.get("/plantation", { params });
       if (response.data?.Status === 1) {
         const plantations = response.data?.Plantation || [];
         setTreeDetail(plantations);
@@ -310,17 +323,17 @@ const ViewTreeDetail = () => {
   return (
     <div className="p-4">
       <div className="d-flex justify-content-between mb-3 align-items-center">
-        <h2 className="fw-bold">Tree Detail List</h2>
-
-        <button
-          className="btn btn-sm btn-primary"
-          onClick={() => setShowFilter((prev) => !prev)}
-        >
-          {showFilter ? "Hide Filter" : "Show Filter"}
-        </button>
+        <h2 className="commonindex-24">Tree Detail List</h2>
       </div>
-
-      {showFilter && (
+      <div className="d-flex align-items-center gap-2 mb-3 flex-nowrap">
+        <input
+          type="text"
+          className="form-control common-search-input common-index-font14"
+          placeholder="Search tree details..."
+          value={searchQuery || ""}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{ width: 220, minWidth: 180, fontSize: 14 }}
+        />
         <CommonFilter
           filters={filters}
           dropdowns={dropdowns}
@@ -328,7 +341,7 @@ const ViewTreeDetail = () => {
           onFilterChange={handleFilterChange}
           onClearFilters={handleClearFilters}
         />
-      )}
+      </div>
 
       <CommonTable
         title="Tree Plantation List"

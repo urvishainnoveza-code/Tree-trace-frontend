@@ -182,7 +182,7 @@ const CityManager = () => {
     return Object.keys(temp).length === 0;
   };
 
-//form input change
+  //form input change
   const handleChange = (updatedData) => {
     if (updatedData.country !== formData.country) {
       updatedData = { ...updatedData, state: "" };
@@ -230,7 +230,6 @@ const CityManager = () => {
     setErrors({});
     setShowEditModal(true);
   };
-
 
   const handleCloseModal = () => {
     setShowAddModal(false);
@@ -312,7 +311,6 @@ const CityManager = () => {
     }
   };
 
-
   const handleDelete = async (row) => {
     const result = await confirmDelete(
       `Are you sure you want to delete "${row.name}"?`,
@@ -346,7 +344,6 @@ const CityManager = () => {
     }
   };
 
-
   const countryOptions = countries.map((country) => ({
     value: country._id,
     label: country.name || country.countryname,
@@ -356,7 +353,6 @@ const CityManager = () => {
     const stateCountryId = state.country?._id || state.country;
     return String(stateCountryId) === String(formData.country);
   });
-
 
   const stateOptions = filteredStates.map((state) => ({
     value: state._id,
@@ -394,7 +390,6 @@ const CityManager = () => {
     { label: "City Name", key: "cityname" },
   ];
 
-  
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
@@ -403,15 +398,25 @@ const CityManager = () => {
 
   return (
     <div className="p-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3 className="mb-0">City Management</h3>
-        <input
-          type="text"
-          className="form-control w-25"
-          placeholder="Search cities (min 3 chars)..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      <div className="mb-3">
+        <div className="d-flex justify-content-between align-items-center">
+          <h3 className="mb-0 commonindex-26">City Management</h3>
+          <button
+            className="btn btn-success add-user-btn common-index-font14"
+            onClick={handleAddClick}
+          >
+            + Add City
+          </button>
+        </div>
+        <div className="d-flex align-items-center gap-2 mt-2">
+          <input
+            type="text"
+            className="form-control common-search-input common-index-font14"
+            placeholder="Search cities (min 3 chars)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
       {/* Loading State */}
