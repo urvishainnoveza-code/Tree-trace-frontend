@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import $ from "jquery";
+import "select2/dist/css/select2.min.css";
+import "select2";
 import "./common.css";
 
 const CommonFilter = ({
@@ -55,6 +58,33 @@ const CommonFilter = ({
     status: dropdowns.status || [],
   };
 
+  // Ref for Area select
+  const areaSelectRef = useRef();
+
+  // Initialize Select2 only for Area filter
+  useEffect(() => {
+    const areaSelect = areaSelectRef.current;
+    if (filtersToShow.includes("areaId") && areaSelect) {
+      $(areaSelect).select2({
+        width: "resolve",
+        placeholder: `All ${labelsMap["areaId"]}`,
+        className: "common-index-font14",
+        allowClear: true,
+      });
+      // Sync value if changed externally
+      $(areaSelect).on("change", function (e) {
+        handleChange("areaId", e.target.value);
+      });
+    }
+    return () => {
+      if (areaSelect) {
+        $(areaSelect).off("change");
+        $(areaSelect).select2("destroy");
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtersToShow, dropdowns.areaId]);
+
   const labelsMap = {
     countryId: "Country",
     stateId: "State",
@@ -68,50 +98,79 @@ const CommonFilter = ({
   };
 
   return (
-    <div className="common-filter-container">
+    <div className="common-filter-container d-flex align-items-center gap-2 flex-wrap">
       {filtersToShow.map((key) => (
         <div className="common-filter-item" key={key}>
-          <label>{labelsMap[key]}</label>
-
           {/* Dropdown Fields */}
           {optionsMap[key] ? (
-            <select
-              value={selectedFilters[key]}
-              onChange={(e) => handleChange(key, e.target.value)}
-            >
-              <option value="">All {labelsMap[key]}</option>
-              {optionsMap[key].map((item) => (
-                <option
-                  key={item?._id || item?.id || item?.value || String(item)}
-                  value={item?._id || item?.id || item?.value || ""}
-                >
-                  {item?.name ||
-                    item?.treeName ||
-                    item?.areaName ||
-                    item?.areaname ||
-                    (typeof item === "string" ? item : "N/A")}
+            key === "areaId" ? (
+              <select
+                ref={areaSelectRef}
+                className="form-select user-filter-select common-index-font14 area-select2"
+                value={selectedFilters[key]}
+                onChange={(e) => handleChange(key, e.target.value)}
+              >
+                <option className="common-index-font14" value="">
+                  All {labelsMap[key]}
                 </option>
-              ))}
-            </select>
+                {optionsMap[key].map((item) => (
+                  <option
+                    key={item?._id || item?.id || item?.value || String(item)}
+                    value={item?._id || item?.id || item?.value || ""}
+                  >
+                    {item?.name ||
+                      item?.treeName ||
+                      item?.areaName ||
+                      item?.areaname ||
+                      (typeof item === "string" ? item : "N/A")}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <select
+                className="form-select user-filter-select common-index-font14"
+                value={selectedFilters[key]}
+                onChange={(e) => handleChange(key, e.target.value)}
+              >
+                <option className="common-index-font14" value="">
+                  All {labelsMap[key]}
+                </option>
+                {optionsMap[key].map((item) => (
+                  <option
+                    key={item?._id || item?.id || item?.value || String(item)}
+                    value={item?._id || item?.id || item?.value || ""}
+                  >
+                    {item?.name ||
+                      item?.treeName ||
+                      item?.areaName ||
+                      item?.areaname ||
+                      (typeof item === "string" ? item : "N/A")}
+                  </option>
+                ))}
+              </select>
+            )
           ) : null}
-
           {key === "date" ? (
             <input
               type="date"
+              className="form-control user-search-input common-index-font14"
               value={selectedFilters[key]}
               onChange={(e) => handleChange(key, e.target.value)}
             />
           ) : null}
-          {/* Date Fields */}
-          
         </div>
       ))}
-
-      <div className="common-filter-actions">
-        <button className="common-filter-button" onClick={handleApply}>
+      <div className="common-filter-actions d-flex gap-2 common-index-font14">
+        <button
+          className="btn btn-success user-filter-btn common-index-font14"
+          onClick={handleApply}
+        >
           Apply
         </button>
-        <button className="common-filter-button clear" onClick={handleClear}>
+        <button
+          className="btn btn-secondary user-filter-btn common-index-font14"
+          onClick={handleClear}
+        >
           Clear
         </button>
       </div>

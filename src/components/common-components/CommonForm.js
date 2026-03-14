@@ -14,7 +14,9 @@ const CommonForm = ({
         <div key={i} className={field.colClass || "col-md-6"}>
           <label className="form-label">
             {field.label}
-            {field.required && !disabled && " *"}
+            {field.required && !disabled && (
+              <span className="common-required-star">*</span>
+            )}
           </label>
 
           {field.type === "select" ? (
@@ -33,17 +35,6 @@ const CommonForm = ({
                 </option>
               ))}
             </select>
-          ) : field.type === "textarea" ? (
-            <textarea
-              name={field.name}
-              className="form-control"
-              value={formData[field.name] || ""}
-              onChange={onChange}
-              required={field.required}
-              disabled={disabled || field.disabled}
-              placeholder={field.placeholder || ""}
-              rows={field.rows || 3}
-            />
           ) : field.type === "radio" ? (
             <div className="radio-group">
               {field.options?.map((opt) => (
@@ -84,12 +75,10 @@ const CommonForm = ({
               type="file"
               name={field.name}
               className="form-control"
-              onChange={onChange}
-              required={field.required}
+              accept={field.accept || "image/*"}
               disabled={disabled || field.disabled}
               multiple={field.multiple}
-              accept={field.accept}
-              placeholder={field.placeholder}
+              onChange={onChange}
             />
           ) : field.type === "textarea" ? (
             <textarea

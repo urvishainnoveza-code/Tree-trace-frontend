@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axiosInstance from "../../../utils/axiosInstance";
 import CommonTable from "../../../components/common-components/CommonTable";
 import CommonModalForm from "../../../components/common-components/CommonModalForm";
+import "../../../components/common-components/common.css";
 import {
   toastSuccess,
   toastError,
@@ -11,7 +12,6 @@ const StateManager = () => {
   const [states, setStates] = useState([]);
   const [countries, setCountries] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedState, setSelectedState] = useState(null);
@@ -326,6 +326,7 @@ const StateManager = () => {
       type: "select",
       required: true,
       options: countryOptions,
+      className: "common-index-font14",
     },
     {
       label: "State Name",
@@ -333,6 +334,7 @@ const StateManager = () => {
       type: "text",
       required: true,
       placeholder: "Enter state name",
+      className: "common-index-font14",
     },
   ];
 
@@ -340,8 +342,8 @@ const StateManager = () => {
    * Table columns configuration
    */
   const columns = [
-    { label: "Country Name", key: "countryname" },
-    { label: "State Name", key: "statename" },
+    { label: "Country Name", key: "countryname" ,className: "common-index-font14" },
+    { label: "State Name", key: "statename" ,className: "common-index-font14" },
   ];
 
   /**
@@ -355,16 +357,26 @@ const StateManager = () => {
 
   return (
     <div className="p-4">
-      {/* Header with Search */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3 className="mb-0">State Management</h3>
-        <input
-          type="text"
-          className="form-control w-25"
-          placeholder="Search states (min 3 chars)..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      {/* Header with Add button and Search */}
+      <div className="mb-3">
+        <div className="d-flex justify-content-between align-items-center">
+          <h3 className="mb-0 commonindex-26">State Management</h3>
+          <button
+            className="btn btn-success add-user-btn common-index-font14"
+            onClick={handleAddClick}
+          >
+            + Add State
+          </button>
+        </div>
+        <div className="d-flex align-items-center gap-2 mt-2">
+          <input
+            type="text"
+            className="form-control common-search-input common-index-font14"
+            placeholder="Search states (min 3 chars)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
       {/* Loading State */}

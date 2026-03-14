@@ -2,6 +2,7 @@ import React from "react";
 import "./common.css";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from "react-select";
+import "../common-components/common.css";
 
 const CommonModalForm = ({
   visible,
@@ -71,7 +72,7 @@ const CommonModalForm = ({
 
                           {field.type === "select" && (
                             <select
-                              className={fieldError ? "is-invalid" : ""}
+                              className={`form-select common-index-font14 ${fieldError ? "is-invalid" : ""}`}
                               value={values[field.name] || ""}
                               onChange={(e) =>
                                 handleChange(field.name, e.target.value)
@@ -89,7 +90,10 @@ const CommonModalForm = ({
                           {field.type === "radio" && (
                             <div className="radio-group">
                               {field.options.map((opt, idx) => (
-                                <label key={idx} className="radio-label">
+                                <label
+                                  key={idx}
+                                  className="radio-label common-index-font14 "
+                                >
                                   <input
                                     type="radio"
                                     name={field.name}
@@ -107,7 +111,7 @@ const CommonModalForm = ({
 
                           {field.type === "textarea" && (
                             <textarea
-                              className={fieldError ? "is-invalid" : ""}
+                              className={`form-control common-index-font14 ${fieldError ? "is-invalid" : ""}`}
                               placeholder={field.placeholder || ""}
                               value={values[field.name] || ""}
                               onChange={(e) =>
@@ -120,7 +124,7 @@ const CommonModalForm = ({
                           {field.type === "date" && (
                             <input
                               type="date"
-                              className={fieldError ? "is-invalid" : ""}
+                              className={`form-control common-index-font14 ${fieldError ? "is-invalid" : ""}`}
                               value={values[field.name] || ""}
                               onChange={(e) =>
                                 handleChange(field.name, e.target.value)
@@ -201,7 +205,7 @@ const CommonModalForm = ({
                               field.type !== "file")) && (
                             <input
                               type={field.type || "text"}
-                              className={fieldError ? "is-invalid" : ""}
+                              className={`form-control common-index-font14 ${fieldError ? "is-invalid" : ""}`}
                               placeholder={field.placeholder || ""}
                               value={values[field.name] || ""}
                               onChange={(e) =>
@@ -242,7 +246,7 @@ const CommonModalForm = ({
 
                     {field.type === "textarea" ? (
                       <textarea
-                        className={fieldError ? "is-invalid" : ""}
+                        className={`form-control common-index-font14 ${fieldError ? "is-invalid" : ""}`}
                         placeholder={field.placeholder || ""}
                         value={values[field.name] || ""}
                         onChange={(e) =>
@@ -253,7 +257,7 @@ const CommonModalForm = ({
                     ) : field.type === "date" ? (
                       <input
                         type="date"
-                        className={fieldError ? "is-invalid" : ""}
+                        className={`form-control common-index-font14 ${fieldError ? "is-invalid" : ""}`}
                         value={values[field.name] || ""}
                         onChange={(e) =>
                           handleFieldChange(field.name, e.target.value)
@@ -261,6 +265,8 @@ const CommonModalForm = ({
                       />
                     ) : field.type === "select" ? (
                       <Select
+                        classNamePrefix="common-index-font14"
+                        className="common-index-font14"
                         options={field.options || []}
                         isMulti={field.isMulti}
                         placeholder={
@@ -321,7 +327,7 @@ const CommonModalForm = ({
                         ) : (
                           <input
                             type="file"
-                            className={fieldError ? "is-invalid" : ""}
+                            className={`form-control common-index-font14 ${fieldError ? "is-invalid" : ""}`}
                             accept={field.accept || "image/*"}
                             onChange={(e) => {
                               const file = e.target.files[0];
@@ -334,7 +340,7 @@ const CommonModalForm = ({
                       <div className="form-check mt-2">
                         <input
                           type="checkbox"
-                          className={fieldError ? "is-invalid" : ""}
+                          className={`form-check-input common-index-font14 ${fieldError ? "is-invalid" : ""}`}
                           id={field.name}
                           checked={values[field.name] || false}
                           onChange={(e) =>
@@ -351,7 +357,7 @@ const CommonModalForm = ({
                     ) : (
                       <input
                         type={field.type || "text"}
-                        className={fieldError ? "is-invalid" : ""}
+                        className={`form-control common-index-font14 ${fieldError ? "is-invalid" : ""}`}
                         placeholder={field.placeholder || ""}
                         value={values[field.name] || ""}
                         onChange={(e) =>

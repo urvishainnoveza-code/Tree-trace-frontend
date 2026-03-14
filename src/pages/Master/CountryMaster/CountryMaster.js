@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axiosInstance from "../../../utils/axiosInstance";
 import CommonTable from "../../../components/common-components/CommonTable";
 import CommonModalForm from "../../../components/common-components/CommonModalForm";
+import "../../../components/common-components/common.css";
 import {
   toastSuccess,
   toastError,
@@ -125,6 +126,7 @@ const CountryMaster = () => {
       name: "name",
       type: "text",
       required: true,
+      className: "common-index-font14",
       placeholder: "Enter country name",
     },
   ];
@@ -242,15 +244,25 @@ const CountryMaster = () => {
 
   return (
     <div className="p-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3 className="mb-0">Country Management</h3>
-        <input
-          type="text"
-          className="form-control w-25"
-          placeholder="Search countries (min 3 chars)..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      <div className="mb-3">
+        <div className="d-flex justify-content-between align-items-center">
+          <h3 className="mb-0 commonindex-26">Country Management</h3>
+          <button
+            className="btn btn-success add-user-btn common-index-font14"
+            onClick={handleAddClick}
+          >
+            + Add Country
+          </button>
+        </div>
+        <div className="d-flex align-items-center gap-2 mt-2">
+          <input
+            type="text"
+            className="form-control common-search-input common-index-font14 "
+            placeholder="Search countries (min 3 chars)..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
       {loading ? (

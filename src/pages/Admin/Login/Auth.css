@@ -1,54 +1,150 @@
+/* Auth layout - split illustration + form card (no gradients, no social buttons) */
 .auth-container {
-  min-height: 100vh;
+  /* center the auth card in the middle of the viewport */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: auto; /* content-driven height */
+  width: 85%;
+  margin: 0; /* centered via transform */
+  display: flex;
+  align-items: stretch; /* make left and right equal height */
+  justify-content: center;
+  padding: 0px;
+  box-sizing: border-box;
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+}
+
+.auth-left {
+  flex: 0 0 50%;
+  max-width: 50%;
+  min-height: 0; /* allow flex container to control height */
+  border-radius: 18px 0px 0px 18px;
+  overflow: hidden;
+  position: relative;
+  background-image: url("../../../assets/background.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.illustration-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.14);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px;
+}
+
+.illustration-title {
+  font-size: 34px;
+  font-weight: 800;
+  color: #123b22;
+  margin-bottom: 8px;
+}
+
+.illustration-sub {
+  font-size: 16px;
+  color: #17482f;
+  max-width: 420px;
+}
+
+/* Inner white rounded card on the left illustration 
+.left-inner-card {
+  width: 86%;
+  height: 100%; 
+  margin: 32px auto;
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 18px 40px rgba(17,24,39,0.06);
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  padding: 24px 48px;
-  background-image: linear-gradient(
-      rgba(255, 255, 255, 0.18),
-      rgba(255, 255, 255, 0.18)
-    ),
-    url("../../../assets/background.jpg");
-  background-size: cover;
-  background-position: right center;
+  justify-content: center;
+  padding: 28px;
+  box-sizing: border-box;
+}*/
+
+.left-inner-illustration {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  background-image: url("../../../assets/background.jpg");
+  background-size: contain; /* scale image to fit while preserving aspect */
   background-repeat: no-repeat;
+  background-position: center;
 }
 
 .auth-card {
-  width: 100%;
-  max-width: 460px;
-  background: rgba(255, 255, 255, 0.97);
-  border-radius: 16px;
-  box-shadow: 0 16px 40px rgba(46, 125, 50, 0.16);
-  border: 1px solid rgba(67, 160, 71, 0.15);
-  backdrop-filter: blur(6px);
+  flex: 0 0 50%;
+  max-width: 50%;
+  background: #ffffff;
+  border-radius: 0px 18px 18px 0px;
+  box-shadow: 0 18px 40px rgba(17,24,39,0.06);
+  border: 1px solid rgba(16,185,129,0.06);
   overflow: hidden;
-  margin-right: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .auth-header {
-  padding: 32px 24px;
+  padding: 28px 28px;
   text-align: center;
-  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 50%, #43a047 100%);
-  color: #fff;
 }
 
 .auth-title {
   margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-  color: #ffffff;
+  font-size: 26px;
+  font-weight: 800;
+  color: #17482f;
 }
 
 .auth-subtitle {
   margin: 8px 0 0;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.92);
+  color: #3e6e4d;
+}
+
+/* Pill toggle like mockup */
+.pill-toggle {
+  display: inline-flex;
+  background: #eef6ef;
+  border-radius: 999px;
+  padding: 6px;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.pill-toggle button {
+  border: 0;
+  background: transparent;
+  padding: 8px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #2f6b3f;
+}
+.pill-toggle button.active {
+  background: #2e7d32;
+  color: #fff;
 }
 
 .auth-body {
-  padding: 28px 24px;
+  padding: 28px 24px 36px;
+  flex: 1; /* allow body to expand so card and left column match */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* vertically center form content */
 }
+
+/* Input with left icon */
+.input-with-icon { position: relative; }
+.input-with-icon .icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; display:flex; align-items:center; justify-content:center; color:#2e7d32; }
+.input-with-icon .auth-input { padding-left: 44px; }
+
+.forgot-row { display:flex; justify-content:flex-end; margin-top:6px; }
+.forgot-row .auth-btn-link { font-size:13px; color:#4b7a4b; }
 
 .auth-form-group {
   margin-bottom: 16px;
@@ -57,9 +153,9 @@
 .auth-label {
   display: block;
   margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #1b5e20;
+  font-size: 13px;
+  font-weight: 700;
+  color: #214f34;
 }
 
 .auth-required {
@@ -68,19 +164,19 @@
 
 .auth-input {
   width: 100%;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
+  border: 1px solid #e6eef0;
+  border-radius: 12px;
   padding: 12px 14px;
   font-size: 15px;
-  background: #ffffff;
-  color: #1f2937;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: #fbfffb;
+  color: #0f1720;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .auth-input:focus {
   outline: none;
   border-color: #2e7d32;
-  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+  box-shadow: 0 6px 18px rgba(46,125,50,0.06);
 }
 
 .auth-input:disabled {
@@ -100,19 +196,19 @@
 .auth-btn-primary {
   width: 100%;
   border: 0;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 12px 16px;
-  background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
-  color: #fff;
+  background: #2e7d32; /* solid green */
+  color: #ffffff;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .auth-btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
-  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(46,125,50,0.08);
 }
 
 .auth-btn-primary:disabled {
@@ -166,9 +262,33 @@
   gap: 12px;
 }
 
-@media (max-width: 576px) {
-  .auth-grid-2 {
-    grid-template-columns: 1fr;
-    gap: 0;
+@media (max-width: 900px) {
+  .auth-container {
+    /* fall back to normal flow on small screens so page can scroll */
+    position: static;
+    transform: none;
+    flex-direction: column;
+    padding: 20px;
+    width: 100%;
+    margin: 0 auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .auth-left {
+    display: none;
+  }
+
+  .auth-card {
+    flex: 0 0 100%;
+    max-width: 100%;
+    border-radius: 12px;
   }
 }
+
+@media (max-width: 420px) {
+  .auth-body { padding: 20px; }
+  .auth-title { font-size: 22px; }
+}
+
+/* end */

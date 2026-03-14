@@ -18,7 +18,9 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
     state: "",
     city: "",
     area: "",
+    profilePhoto: null,
   });
+  const [preview, setPreview] = useState(null);
 
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
@@ -72,12 +74,15 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
     }
   };
 
-  const handleChange = async (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-
+    if (name === "profilePhoto") {
+      setValues((prev) => ({ ...prev, profilePhoto: value }));
+      setPreview(value ? URL.createObjectURL(value) : null);
+      return;
+    }
     setValues((prev) => {
       const next = { ...prev, [name]: value };
-
       if (next.country !== prev.country) {
         if (next.country) fetchStates(next.country);
         next.state = "";
@@ -87,7 +92,6 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
         setCities([]);
         setAreas([]);
       }
-
       if (next.state !== prev.state) {
         if (next.state) fetchCities(next.state);
         next.city = "";
@@ -95,13 +99,11 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
         setCities([]);
         setAreas([]);
       }
-
       if (next.city !== prev.city) {
         if (next.city) fetchAreas(next.city);
         next.area = "";
         setAreas([]);
       }
-
       return next;
     });
   };
@@ -110,7 +112,6 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
     try {
       setLoading(true);
       setError("");
-
       if (
         !values.firstName ||
         !values.lastName ||
@@ -121,7 +122,6 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
         setLoading(false);
         return;
       }
-
       const payload = {
         firstName: values.firstName,
         lastName: values.lastName,
@@ -135,12 +135,20 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
         area: values.area,
         userType: "user",
       };
-
-      const res = await axiosInstance.post("/users", payload);
-
+      const formData = new FormData();
+      Object.keys(values).forEach((key) => {
+        if (values[key]) {
+          formData.append(key, values[key]);
+        }
+      });
+      formData.append("userType", "user");
+      const res = await axiosInstance.post("/users", formData,payload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       if (res.data.Status === 1) {
         alert("User created successfully!");
-        // Reset form
         setValues({
           firstName: "",
           lastName: "",
@@ -155,7 +163,9 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
           state: "",
           city: "",
           area: "",
+          profilePhoto: null,
         });
+        setPreview(null);
         if (onSuccess) onSuccess();
         if (onSaved) onSaved();
         onClose && onClose();
@@ -252,6 +262,12 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
       })),
       disabled: !values.city,
     },
+    {
+      label: "Profile Photo",
+      name: "profilePhoto",
+      type: "file",
+      colClass: "col-md-12",
+    }
   ];
 
   return (
@@ -276,6 +292,15 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
     >
       {error && <div className="alert alert-danger mb-3">{error}</div>}
       <CommonForm fields={fields} formData={values} onChange={handleChange} />
+      {preview && (
+        <div className="mt-3 text-center">
+          <img
+            src={preview}
+            alt="Preview"
+            style={{ width: 120, height: 120, borderRadius: "50%" }}
+          />
+        </div>
+      )}
     </CommonModel>
   );
 };

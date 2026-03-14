@@ -180,8 +180,8 @@ function Login() {
   };
 
   // Add a manual location refresh button for professional user experience
-  {
-    /*const handleLocationRefresh = () => {
+  /*
+  const handleLocationRefresh = () => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -200,157 +200,213 @@ function Login() {
     } else {
       toastError("Geolocation is not supported in this browser.");
     }
-  };*/
+  };
+  */
+
+  // Show location prompt or error before login UI
+  if (locationAllowed === null) {
+    return (
+      <div className="d-flex align-items-center justify-content-center min-vh-100">
+        <div className="w-50 d-block bg-white shadow-lg rounded my-5">
+          <div className="p-5 text-center">
+            <h1 className="h5 mb-3">Welcome Back!</h1>
+            <div className="mb-4">
+              Requesting location access. Please allow to continue…
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (locationAllowed === false) {
+    return (
+      <div className="d-flex align-items-center justify-content-center min-vh-100">
+        <div className="w-50 d-block bg-white shadow-lg rounded my-5">
+          <div className="p-5 text-center">
+            <h1 className="h5 mb-3">Welcome Back!</h1>
+            <div className="text-danger mb-4">
+              Location access required to continue.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
+  // ...existing code for login UI...
   return (
     <div className="auth-container">
+      <div className="auth-left">
+        <div className="illustration-overlay">
+          <div className="illustration-title">TreeTrack</div>
+          <div className="illustration-sub">
+            Track, monitor & manage your trees efficiently.
+          </div>
+        </div>
+      </div>
       <div className="auth-card">
         <div className="auth-header">
-          <h2 className="auth-title">Tree Trace</h2>
-          <h1 className="h5 mb-3 text-center">Welcome Back!</h1>
+          <div className="pill-toggle">
+            <button className="active">Sign In</button>
+            <button onClick={() => navigate("/signup")}>Sign Up</button>
+          </div>
+          <h2 className="auth-title">Sign In</h2>
+          <p className="auth-subtitle">
+            {!showPassword
+              ? "Welcome back! Please login to continue"
+              : "Enter your password"}
+          </p>
         </div>
-
-        {locationAllowed === null ? (
-          <div className="auth-body text-center py-5">
-            <div className="spinner-border text-primary mb-3" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
-            <p className="auth-subtitle">Requesting location access...</p>
-            <p className="text-muted small">
-              Please allow location access to continue
-            </p>
-          </div>
-        ) : locationAllowed === false ? (
-          <div className="auth-body text-center py-5">
-            <p className="auth-subtitle text-danger">
-              Location access required to continue
-            </p>
-            <p className="text-muted small">
-              Please enable location access in your browser settings
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="auth-body">
-              {!showPassword ? (
-                // EMAIL FORM
-                <form onSubmit={handleEmailSubmit}>
-                  <div className="auth-form-group">
-                    <label className="auth-label">
-                      Email Address <span className="auth-required">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="auth-input"
-                      disabled={isSubmitting}
-                      autoFocus
-                    />
-                  </div>
-
+        <div className="auth-body">
+          {!showPassword ? (
+            <form onSubmit={handleEmailSubmit}>
+              <div className="auth-form-group">
+                <label className="auth-label">
+                  Email Address <span className="auth-required">*</span>
+                </label>
+                <div className="input-with-icon">
+                  <span className="icon" aria-hidden>
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="18"
+                      height="18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3 6.5L12 13L21 6.5"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="auth-input"
+                    disabled={isSubmitting}
+                    autoFocus
+                  />
+                </div>
+              </div>
+              <button
+                type="submit"
+                className="auth-btn-primary"
+                disabled={isSubmitting || !email}
+              >
+                {isSubmitting ? "Checking..." : "Continue"}
+              </button>
+              <div className="auth-divider-top auth-text-center">
+                <p className="auth-muted">
+                  Don't have an account?{" "}
                   <button
-                    type="submit"
-                    className="auth-btn-primary"
-                    disabled={
-                      isSubmitting ||
-                      !email ||
-                      !coords.latitude ||
-                      !coords.longitude ||
-                      locationAllowed !== true
-                    }
-                  >
-                    {isSubmitting ? "Checking..." : "Continue"}
-                  </button>
-
-                  {/* Sign Up Link */}
-                  <div className="auth-divider-top auth-text-center">
-                    <p className="auth-muted">
-                      Don't have an account?{" "}
-                      <button
-                        type="button"
-                        className="auth-btn-link"
-                        onClick={() => navigate("/signup")}
-                        disabled={isSubmitting}
-                      >
-                        Sign up here
-                      </button>
-                    </p>
-                  </div>
-
-                  {/* Refresh Location button can be removed or kept for fallback, but is no longer required */}
-                  {/* <button
                     type="button"
-                    className="auth-btn-secondary"
-                    onClick={handleLocationRefresh}
+                    className="auth-btn-link"
+                    onClick={() => navigate("/signup")}
                     disabled={isSubmitting}
                   >
-                    Refresh Location
-                  </button> */}
-                </form>
-              ) : (
-                // PASSWORD FORM (SuperAdmin)
-                <form onSubmit={handlePasswordSubmit}>
-                  <div className="auth-form-group">
-                    <label className="auth-label">
-                      Password <span className="auth-required">*</span>
-                    </label>
-                    <input
-                      type="password"
-                      placeholder="Enter SuperAdmin Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="auth-input"
-                      disabled={isSubmitting}
-                      autoFocus
-                      minLength="6"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="auth-btn-primary"
-                    disabled={isSubmitting || !password}
-                  >
-                    {isSubmitting ? "Logging In..." : "Login as SuperAdmin"}
+                    Sign up here
                   </button>
-
+                </p>
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={handlePasswordSubmit}>
+              <div className="auth-form-group">
+                <label className="auth-label">
+                  Password <span className="auth-required">*</span>
+                </label>
+                <div className="input-with-icon">
+                  <span className="icon" aria-hidden>
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="18"
+                      height="18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <rect
+                        x="3"
+                        y="11"
+                        width="18"
+                        height="10"
+                        rx="2"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                      />
+                      <path
+                        d="M7 11V8a5 5 0 0110 0v3"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="auth-input"
+                    disabled={isSubmitting}
+                    autoFocus
+                    minLength="6"
+                  />
+                </div>
+                <div className="forgot-row">
                   <button
                     type="button"
-                    className="auth-btn-link auth-btn-back"
+                    className="auth-btn-link"
                     onClick={() => {
-                      setShowPassword(false);
-                      setPassword("");
-                      setEmail("");
+                      /* implement forgot */
                     }}
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              </div>
+              <button
+                type="submit"
+                className="auth-btn-primary"
+                disabled={isSubmitting || !password}
+              >
+                {isSubmitting ? "Logging In..." : "Sign In"}
+              </button>
+              <button
+                type="button"
+                className="auth-btn-link auth-btn-back"
+                onClick={() => {
+                  setShowPassword(false);
+                  setPassword("");
+                  setEmail("");
+                }}
+                disabled={isSubmitting}
+              >
+                ← Back to Email
+              </button>
+              <div className="auth-divider-top auth-text-center">
+                <p className="auth-muted">
+                  Don't have an account?{" "}
+                  <button
+                    type="button"
+                    className="auth-btn-link"
+                    onClick={() => navigate("/signup")}
                     disabled={isSubmitting}
                   >
-                    ← Back to Email
+                    Sign up here
                   </button>
-
-                  {/* Sign Up Link */}
-                  <div className="auth-divider-top auth-text-center">
-                    <p className="auth-muted">
-                      Don't have an account?{" "}
-                      <button
-                        type="button"
-                        className="auth-btn-link"
-                        onClick={() => navigate("/signup")}
-                        disabled={isSubmitting}
-                      >
-                        Sign up here
-                      </button>
-                    </p>
-                  </div>
-                </form>
-              )}
-            </div>
-          </>
-        )}
+                </p>
+              </div>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );

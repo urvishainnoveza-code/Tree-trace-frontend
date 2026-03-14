@@ -40,7 +40,7 @@ const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
         state: initialData.assign?.state?.name || "",
         city: initialData.assign?.city?.name || "",
         area: initialData.assign?.area?.name || "",
-        address: initialData.assign?.address?.name || "",
+        address: initialData.address || "",
         plantedCount: initialData.plantedCount || "",
         cage: initialData.cage ? "Yes" : "No",
         watering: initialData.watering ? "Yes" : "No",
@@ -61,7 +61,6 @@ const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
         state: initialData.state || "",
         city: initialData.city || "",
         area: initialData.area || "",
-        address: initialData.address || "",
         images: [],
       }));
       setExistingImages([]);
@@ -77,7 +76,6 @@ const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
     {
       label: "Tree Name",
       name: "treename",
-      required: true,
       disabled: true,
     },
     { label: "Country", name: "country", disabled: true },
@@ -89,6 +87,7 @@ const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
       name: "address",
       type: "textarea",
       disabled: isEditMode,
+      required: true,
       placeholder: "Address:(near yogi banglos, sector 137, noida)",
     },
     {

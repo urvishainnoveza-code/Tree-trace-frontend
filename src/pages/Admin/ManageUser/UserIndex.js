@@ -5,6 +5,8 @@ import CommonTable from "../../../components/common-components/CommonTable";
 import CommonForm from "../../../components/common-components/CommonForm";
 import CommonFilter from "../../../components/common-components/CommonFilter";
 import { getUser, getUserType } from "../../../utils/auth";
+import "../../../components/layout/layout.css";
+import "../../../components/common-components/common.css";
 import {
   confirmDelete,
   toastError,
@@ -40,7 +42,7 @@ const UserIndex = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  //const [totalPages, setTotalPages] = useState(1);
   //const [totalUsers, setTotalUsers] = useState(0);
   const [mode, setMode] = useState("add");
   const [showModal, setShowModal] = useState(false);
@@ -52,9 +54,9 @@ const UserIndex = () => {
   const [cities, setCities] = useState([]);
   const [areas, setAreas] = useState([]);
   const [formFields, setFormFields] = useState([]);
+  //const [profilePreview, setProfilePreview] = useState(null);
 
   // Filter states
-  const [showFilter, setShowFilter] = useState(false);
   const [filters, setFilters] = useState({
     countryId: "",
     stateId: "",
@@ -115,8 +117,8 @@ const UserIndex = () => {
           (user) => user.role?.name !== "superAdmin",
         );
         setUsers(filteredUsers);
-        setTotalPages(usersPayload.totalPages || 1);
-       // setTotalUsers(usersPayload.totalUsers || 0);
+        // setTotalPages(usersPayload.totalPages || 1);
+        // setTotalUsers(usersPayload.totalUsers || 0);
       } else {
         toastError(
           payload.Message || payload.message || "Failed to fetch users",
@@ -335,6 +337,7 @@ const UserIndex = () => {
         city: cityId,
         area: fetchedUser.area?._id || "",
       });
+      // setProfilePreview(fetchedUser.profilePhoto || null);
 
       if (countryId) await fetchStates(countryId);
       if (stateId) await fetchCities(countryId, stateId);
@@ -365,6 +368,7 @@ const UserIndex = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, location.pathname]);
 
+  // Add User button handler
   const openAddModal = () => {
     if (location.pathname !== "/manage-user/add") {
       navigate("/manage-user/add");
@@ -420,6 +424,13 @@ const UserIndex = () => {
   const handleInputChange = async (e) => {
     const { name, value } = e.target;
 
+    if (name === "profilePhoto") {
+      const file = e.target.files && e.target.files[0];
+      setFormData((prev) => ({ ...prev, profilePhoto: file }));
+      // setProfilePreview(file ? URL.createObjectURL(file) : null);
+      return;
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (formErrors[name]) {
       setFormErrors((prev) => ({ ...prev, [name]: "" }));
@@ -452,25 +463,32 @@ const UserIndex = () => {
 
     setSubmitting(true);
     try {
-      const payload = {
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        email: formData.email.trim(),
-        phoneNo: formData.phoneNo,
-        birthDate: formData.birthDate,
-        gender: formData.gender,
-        country: formData.country,
-        state: formData.state,
-        city: formData.city,
-        area: formData.area,
-        houseNo: formData.houseNo,
-        societyName: formData.societyName,
-        landmark: formData.landmark,
-      };
+      const formDataToSend = new FormData();
+      formDataToSend.append("firstName", formData.firstName.trim());
+      formDataToSend.append("lastName", formData.lastName.trim());
+      formDataToSend.append("email", formData.email.trim());
+      formDataToSend.append("phoneNo", formData.phoneNo);
+      formDataToSend.append("birthDate", formData.birthDate);
+      formDataToSend.append("gender", formData.gender);
+      formDataToSend.append("country", formData.country);
+      formDataToSend.append("state", formData.state);
+      formDataToSend.append("city", formData.city);
+      formDataToSend.append("area", formData.area);
+      formDataToSend.append("houseNo", formData.houseNo);
+      formDataToSend.append("societyName", formData.societyName);
+      formDataToSend.append("landmark", formData.landmark);
+      if (formData.profilePhoto) {
+        formDataToSend.append("profilePhoto", formData.profilePhoto);
+      }
+
+      // 3️⃣ Verify FormData (Important)
+      for (let pair of formDataToSend.entries()) {
+        console.log(pair[0], pair[1]);
+      }
 
       if (mode === "add") {
-        payload.userType = "user";
-        const res = await axiosInstance.post("/users", payload);
+        formDataToSend.append("userType", "user");
+        const res = await axiosInstance.post("/users", formDataToSend);
         const responsePayload = res.data || {};
         if ((responsePayload.Status ?? responsePayload.status) === 1) {
           toastSuccess(responsePayload.Message || "User created successfully");
@@ -484,7 +502,7 @@ const UserIndex = () => {
       if (mode === "edit" && selectedUser?._id) {
         const res = await axiosInstance.put(
           `/users/${selectedUser._id}`,
-          payload,
+          formDataToSend,
         );
         const responsePayload = res.data || {};
         if ((responsePayload.Status ?? responsePayload.status) === 1) {
@@ -510,6 +528,8 @@ const UserIndex = () => {
         label: "First Name",
         type: "text",
         required: true,
+        
+        
       },
       {
         name: "lastName",
@@ -528,11 +548,13 @@ const UserIndex = () => {
         name: "phoneNo",
         label: "Phone",
         type: "text",
+        required:true,
       },
       {
         name: "birthDate",
         label: "Birth Date",
         type: "date",
+        required:true,
       },
       {
         name: "gender",
@@ -542,12 +564,14 @@ const UserIndex = () => {
           { value: "male", label: "Male" },
           { value: "female", label: "Female" },
         ],
+        required:true,
       },
       {
         name: "country",
         label: "Country",
         type: "select",
         options: countries.map((c) => ({ value: c._id, label: c.name })),
+        required: true,
       },
       {
         name: "state",
@@ -555,6 +579,7 @@ const UserIndex = () => {
         type: "select",
         options: states.map((s) => ({ value: s._id, label: s.name })),
         disabled: !formData.country,
+        required: true,
       },
       {
         name: "city",
@@ -562,6 +587,7 @@ const UserIndex = () => {
         type: "select",
         options: cities.map((c) => ({ value: c._id, label: c.name })),
         disabled: !formData.state,
+        required: true,
       },
       {
         name: "area",
@@ -570,21 +596,32 @@ const UserIndex = () => {
         required: true,
         options: areas.map((a) => ({ value: a._id, label: a.name })),
         disabled: !formData.city,
+        className: "common-index-font14",
       },
       {
         name: "houseNo",
         label: "House No",
         type: "text",
+
       },
       {
         name: "societyName",
         label: "Society Name",
         type: "text",
+        
       },
       {
         name: "landmark",
         label: "Landmark",
         type: "text",
+        required:true,
+      },
+      {
+        name: "profilePhoto",
+        label: "Profile Photo",
+        type: "file",
+        accept: "image/*",
+        colClass: "col-md-12",
       },
     ]);
   }, [
@@ -620,42 +657,72 @@ const UserIndex = () => {
     <div className="container mt-4">
       {isListPage && isSuperAdmin && (
         <>
+          {/* Header with Add User button on right */}
           <div className="d-flex justify-content-between align-items-center mb-3">
-            <h3>Manage Users</h3>
-            <div className="d-flex align-items-center gap-2">
-                <button
-                className="btn btn-sm btn-primary"
-                onClick={() => setShowFilter(!showFilter)}
-              >
-                {showFilter ? "Hide Filter" : "Show Filter"}
-              </button>
-              <input
-                type="text"
-                className="form-control"
-                style={{ width: "280px" }}
-                placeholder="Search users by name, email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            
+            <h3 className="commonindex-24">User Management</h3>
+            <button
+              className="btn btn-primary add-btn common-index-font14"
+              onClick={openAddModal}
+            >
+              + Add User
+            </button>
+          </div>
+          {/* Cards for Total, Active, Inactive Users */}
+          <div className="d-flex gap-3 mb-4">
+            <div className="card flex-fill text-center p-3 user-count-card">
+              <div className="user-count-label common-index-font14">
+                Total Users
+              </div>
+              <div className="user-count-value">
+                {users.length}
+              </div>
+            </div>
+            <div className="card flex-fill text-center p-3 user-count-card">
+              <div className="user-count-label common-index-font14">
+                Active Users
+              </div>
+              <div className="user-count-value">
+                {users.filter((u) => u.isActive).length}
+              </div>
+            </div>
+            <div className="card flex-fill text-center p-3 user-count-card">
+              <div className="user-count-label common-index-font14">
+                Inactive Users
+              </div>
+              <div className="user-count-value">
+                {users.filter((u) => !u.isActive).length}
+              </div>
             </div>
           </div>
-
-          {showFilter && (
-            <CommonFilter
-              filters={filters}
-              dropdowns={{
-                countryId: filterCountries,
-                stateId: filterStates,
-                cityId: filterCities,
-                areaId: filterAreas,
-              }}
-              onFilterChange={handleFilterChange}
-              onClearFilters={handleClearFilters}
-              filtersToShow={["countryId", "stateId", "cityId", "areaId"]}
-            />
-          )}
-
+          {/* Filter and Search row - all in one line */}
+          <div className="d-flex align-items-center gap-2 mb-3 flex-nowrap">
+            <div className="d-flex align-items-center gap-2 flex-nowrap w-100">
+              <input
+                type="text"
+                className="form-control common-search-input common-index-font14"
+                placeholder="Search user by name, email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ width: 220, minWidth: 180, fontSize: 14 }}
+              />
+              <CommonFilter
+                filters={filters}
+                dropdowns={{
+                  countryId: filterCountries,
+                  stateId: filterStates,
+                  cityId: filterCities,
+                  areaId: filterAreas,
+                }}
+                onFilterChange={handleFilterChange}
+                onClearFilters={handleClearFilters}
+                filtersToShow={["countryId", "stateId", "cityId", "areaId"]}
+                inputClassName="common-filter-select common-index-font14"
+                selectClassName="common-filter-select common-index-font14"
+                buttonClassName="common-filter-btn common-index-font14"
+              />
+            </div>
+          </div>
+          {/* Table */}
           {loading ? (
             <div className="text-center py-5">
               <div className="spinner-border" role="status">
@@ -663,91 +730,34 @@ const UserIndex = () => {
               </div>
             </div>
           ) : (
-            <>
-                {/* {isSuperAdmin && (
-                <div className="mb-2 text-muted">Total Users: {totalUsers}</div>
-              )}*/}
-              <CommonTable
-                title="User List"
-                addLabel="+ Add User"
-                columns={[
-                  { label: "Name", key: "firstName" },
-                  { label: "Email", key: "email" },
-                  { label: "Phone", key: "phoneNo" },
-                  { label: "Country", key: "country.name" },
-                  { label: "State", key: "state.name" },
-                  { label: "City", key: "city.name" },
-                  { label: "Area", key: "area.name" },
-
-                  {
-                    label: "Status",
-                    key: "isActive",
-                    valueMap: { true: "Active", false: "Inactive" },
-                  },
-                ]}
-                data={users}
-                onEdit={(user) => {
-                  const isSelfEdit = loggedInUser?._id === user._id;
-                  if (!isSuperAdmin && !isSelfEdit) {
-                    toastError("You can only edit your own profile");
-                    return;
-                  }
-                  handleEditUser(user);
-                }}
-                onAdd={openAddModal}
-                onDelete={handleDeleteUser}
-                rowKey="_id"
-              />
-
-              {totalPages > 1 && (
-                <nav className="mt-3" aria-label="User pagination">
-                  <ul className="pagination justify-content-center">
-                    <li
-                      className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={() =>
-                          setCurrentPage((prev) => Math.max(prev - 1, 1))
-                        }
-                      >
-                        Previous
-                      </button>
-                    </li>
-                    {Array.from(
-                      { length: totalPages },
-                      (_, index) => index + 1,
-                    ).map((page) => (
-                      <li
-                        key={page}
-                        className={`page-item ${currentPage === page ? "active" : ""}`}
-                      >
-                        <button
-                          className="page-link"
-                          onClick={() => setCurrentPage(page)}
-                        >
-                          {page}
-                        </button>
-                      </li>
-                    ))}
-                    <li
-                      className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={() =>
-                          setCurrentPage((prev) =>
-                            Math.min(prev + 1, totalPages),
-                          )
-                        }
-                      >
-                        Next
-                      </button>
-                    </li>
-                  </ul>
-                </nav>
-              )}
-            </>
+            <CommonTable
+              title="User List"
+              columns={[
+                { label: "Name", key: "firstName" },
+                { label: "Email", key: "email" },
+                { label: "Phone", key: "phoneNo" },
+                { label: "Country", key: "country.name" },
+                { label: "State", key: "state.name" },
+                { label: "City", key: "city.name" },
+                { label: "Area", key: "area.name" },
+                {
+                  label: "Status",
+                  key: "isActive",
+                  valueMap: { true: "Active", false: "Inactive" },
+                },
+              ]}
+              data={users}
+              onEdit={(user) => {
+                const isSelfEdit = loggedInUser?._id === user._id;
+                if (!isSuperAdmin && !isSelfEdit) {
+                  toastError("You can only edit your own profile");
+                  return;
+                }
+                handleEditUser(user);
+              }}
+              onDelete={handleDeleteUser}
+              rowKey="_id"
+            />
           )}
         </>
       )}

@@ -1,156 +1,165 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../../utils/axiosInstance";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import "./profile.css";
 
 const UserProfile = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { id } = useParams();
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await axiosInstance.get(`/users/${id}`);
 
-        if (res.data.Status === 1) {
+        if (res?.data?.Status === 1) {
           setUser(res.data.user);
         }
-      } catch (err) {
-        console.error("User fetch error", err);
+      } catch (error) {
+        console.error("User fetch error:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) {
-      fetchUser();
-    }
+    if (id) fetchUser();
   }, [id]);
+
+  const handleEditProfile = () => {
+    if (user?._id) {
+      navigate(`/manage-user/edit/${user._id}`);
+    }
+  };
 
   if (loading) {
     return (
-      <div className="text-center mt-5">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+      <div className="profile-loading">
+        <h5>Loading user profile...</h5>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="alert alert-warning text-center mt-5">User not found</div>
+      <div className="profile-loading">
+        <h5>User not found</h5>
+      </div>
     );
   }
 
   return (
-    <div className="profile-page container mt-4">
-      <div className="card profile-card">
-        <div className="card-header">
-          <h4 className="card-title">User Profile</h4>
-        </div>
-        <div className="card-body">
-          {user ? (
-            <div>
-              <div className="row mb-4">
-                <div className="col-md-6">
-                  <h5>Personal Information</h5>
-                  <p>
-                    <strong>Name:</strong> {user.firstName} {user.lastName}
-                  </p>
-                  <p>
-                    <strong>Email:</strong> {user.email}
-                  </p>
-                  <p>
-                    <strong>Phone:</strong> {user.phoneNo || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Gender:</strong> {user.gender || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Date of Birth:</strong>{" "}
-                    {user.birthDate
-                      ? new Date(user.birthDate).toLocaleDateString()
-                      : "N/A"}
-                  </p>
-                </div>
-
-                <div className="col-md-6">
-                  <h5>Address Information</h5>
-                  <p>
-                    <strong>Country:</strong> {user.country?.name || "N/A"}
-                  </p>
-                  <p>
-                    <strong>State:</strong> {user.state?.name || "N/A"}
-                  </p>
-                  <p>
-                    <strong>City:</strong> {user.city?.name || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Area:</strong> {user.area?.name || "N/A"}
-                  </p>
-                  <p>
-                    <strong>House No:</strong> {user.houseNo || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Society:</strong> {user.societyName || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Landmark:</strong> {user.landmark || "N/A"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="row">
-                <div className="col-md-6">
-                  <h5>Account Status</h5>
-                  <p>
-                    <strong>Role:</strong> {user.role?.name || "N/A"}
-                  </p>
-                  <p>
-                    <strong>Status:</strong>{" "}
-                    <span
-                      className={`badge ${
-                        user.isActive ? "bg-success" : "bg-danger"
-                      }`}
-                    >
-                      {user.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </p>
-                  <p>
-                    <strong>Email Verified:</strong>{" "}
-                    <span
-                      className={`badge ${
-                        user.emailVerified ? "bg-success" : "bg-warning"
-                      }`}
-                    >
-                      {user.emailVerified ? "Yes" : "No"}
-                    </span>
-                  </p>
-                </div>
-
-                <div className="col-md-6">
-                  <h5>Administrative Info</h5>
-                  <p>
-                    <strong>Created:</strong>{" "}
-                    {new Date(user.createdAt).toLocaleDateString()}
-                  </p>
-                  <p>
-                    <strong>Last Updated:</strong>{" "}
-                    {new Date(user.updatedAt).toLocaleDateString()}
-                  </p>
-                  {user.addedBy && (
-                    <p>
-                      <strong>Added By:</strong> {user.addedBy.firstName}{" "}
-                      {user.addedBy.lastName}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
+    <div className="profile-container">
+      <div className="profile-card">
+        {/* Profile Header */}
+        <div className="profile-header">
+          {user?.profilePhoto ? (
+            <img
+              src={user.profilePhoto}
+              alt="Profile"
+              className="profile-image"
+            />
           ) : (
-            <p className="text-center">No user data available</p>
+            <div className="profile-placeholder">
+              {user?.firstName?.charAt(0)?.toUpperCase() || "?"}
+            </div>
           )}
+
+          <div className="profile-info">
+            <div className="profile-name-row">
+              <h3 className="profile-name">
+                {user?.firstName} {user?.lastName}
+              </h3>
+
+              <span
+                className={`badge ${
+                  user?.isActive ? "bg-success" : "bg-danger"
+                }`}
+              >
+                {user?.isActive ? "Active" : "Inactive"}
+              </span>
+            </div>
+
+            <div className="profile-phone">
+              <span className="phone-icon">📞</span>
+              <span>{user?.phoneNo || "N/A"}</span>
+            </div>
+          </div>
+
+          <button className="btn btn-sm btn-info" onClick={handleEditProfile}>
+            Edit
+          </button>
+        </div>
+
+        {/* Personal + Address */}
+        <div className="profile-sections">
+          <div className="profile-box">
+            <h5>Personal Information</h5>
+            <p>
+              <strong>Email:</strong> {user?.email || "N/A"}
+            </p>
+            <p>
+              <strong>Gender:</strong> {user?.gender || "N/A"}
+            </p>
+            <p>
+              <strong>Date of Birth:</strong>{" "}
+              {user?.birthDate
+                ? new Date(user.birthDate).toLocaleDateString()
+                : "N/A"}
+            </p>
+          </div>
+
+          <div className="profile-box">
+            <h5>Address Information</h5>
+            <p>
+              <strong>Country:</strong> {user?.country?.name || "N/A"}
+            </p>
+            <p>
+              <strong>State:</strong> {user?.state?.name || "N/A"}
+            </p>
+            <p>
+              <strong>City:</strong> {user?.city?.name || "N/A"}
+            </p>
+            <p>
+              <strong>Area:</strong> {user?.area?.name || "N/A"}
+            </p>
+            <p>
+              <strong>Address:</strong>{" "}
+              {[user?.houseNo, user?.societyName, user?.landmark]
+                .filter(Boolean)
+                .join(", ") || "N/A"}
+            </p>
+          </div>
+        </div>
+
+        {/* Administrative Info */}
+        <div className="profile-admin">
+          <h5>Administrative Info</h5>
+
+          <div className="admin-row">
+            <div>
+              <strong>Created:</strong>{" "}
+              {user?.createdAt
+                ? new Date(user.createdAt).toLocaleDateString()
+                : "N/A"}
+            </div>
+
+            <div>
+              <strong>Last Updated:</strong>{" "}
+              {user?.updatedAt
+                ? new Date(user.updatedAt).toLocaleDateString()
+                : "N/A"}
+            </div>
+
+            <div>
+              <strong>Added By:</strong>{" "}
+              {user?.addedBy
+                ? `${user.addedBy.firstName} ${user.addedBy.lastName}`
+                : "System"}
+            </div>
+          </div>
         </div>
       </div>
     </div>

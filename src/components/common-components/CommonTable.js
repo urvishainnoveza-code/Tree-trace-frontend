@@ -6,12 +6,10 @@ const CommonTable = ({
   columns = [],
   data = [],
   actions, // Can be array or function
-  onAdd,
   onEdit,
   onDelete,
   onAssign,
   onView,
-  addLabel = "+ Add",
   rowKey = "_id",
   pagination, // External pagination: { currentPage, totalPages, onPageChange }
   loading = false,
@@ -89,15 +87,7 @@ const CommonTable = ({
     <div className="card mb-4">
       <div className="card-body">
         {/* Header */}
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h4 className="mb-0">{title}</h4>
-
-          {onAdd && (
-            <button className="btn btn-sm btn-primary" onClick={onAdd}>
-              {addLabel}
-            </button>
-          )}
-        </div>
+       
 
         {/* Table */}
         <div className="table-responsive">
