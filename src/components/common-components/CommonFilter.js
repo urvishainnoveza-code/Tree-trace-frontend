@@ -4,6 +4,7 @@ import "select2/dist/css/select2.min.css";
 import "select2";
 import "./common.css";
 
+
 const CommonFilter = ({
   filters = {},
   dropdowns = {},
@@ -69,7 +70,7 @@ const CommonFilter = ({
         width: "resolve",
         placeholder: `All ${labelsMap["areaId"]}`,
         className: "common-index-font14",
-        allowClear: true,
+        allowClear: false,
       });
       // Sync value if changed externally
       $(areaSelect).on("change", function (e) {
@@ -162,7 +163,7 @@ const CommonFilter = ({
       ))}
       <div className="common-filter-actions d-flex gap-2 common-index-font14">
         <button
-          className="btn btn-success user-filter-btn common-index-font14"
+          className="btn btn-primary user-filter-btn common-index-font14"
           onClick={handleApply}
         >
           Apply

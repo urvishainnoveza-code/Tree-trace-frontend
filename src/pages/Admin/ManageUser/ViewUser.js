@@ -309,7 +309,9 @@ const ViewUser = () => {
                     value={editData.country?._id || ""}
                     onChange={handleEditChange}
                   >
-                    <option value="" className="common-index-font14">Select Country</option>
+                    <option value="" className="common-index-font14">
+                      Select Country
+                    </option>
                     {countries.map((c) => (
                       <option key={c._id} value={c._id}>
                         {c.name}
@@ -672,7 +674,7 @@ const ViewUser = () => {
 
   return (
     <div className="p-4">
-      <div className="d-flex justify-content-between mb-3 align-items-center">
+      <div className="header-row-action">
         <h2>User List</h2>
 
         <button
@@ -838,7 +840,7 @@ const handleFilterChange = (key, value) => {
 
   return (
     <div className="p-4">
-      <div className="d-flex justify-content-between mb-3">
+      <div className="header-row-action">
         <h2>User List</h2>
 
         <button

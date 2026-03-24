@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { validateForm as validateFormUtils } from "../../../utils/formUtils";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../utils/axiosInstance";
 import { toastSuccess, toastError } from "../../../utils/alertHelper";
@@ -226,18 +227,28 @@ const CreateAssignment = () => {
     }
   };
 
+  // Validation rules for all required fields
+  const validationRules = {
+    treeName: { required: true },
+    count: { required: true, minLength: 1 },
+    country: { required: true },
+    state: { required: true },
+    city: { required: true },
+    area: { required: true },
+    address: { required: true },
+  };
+
   const validateForm = () => {
-    const errors = {};
-    if (!formData.treeName) errors.treeName = "Tree name is required";
-    if (!formData.count || formData.count <= 0)
+    const errors = validateFormUtils(formData, validationRules);
+    // Custom validation for count (must be > 0)
+    if (formData.count && Number(formData.count) <= 0) {
       errors.count = "Valid count is required";
-    if (!formData.country) errors.country = "Country is required";
-    if (!formData.city) errors.city = "City is required";
-    if (!formData.area) errors.area = "Area is required";
-    if (formData.area && !formData.groupId && !groupInfo)
+    }
+    // Custom validation for groupId if needed
+    if (formData.area && !formData.groupId && !groupInfo) {
       errors.groupId =
         "No users found in selected area. Please select a user group from this city.";
-
+    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -269,9 +280,9 @@ const CreateAssignment = () => {
         group: assignedGroupId,
       };
 
-      console.log("📤 Assignment Payload:", payload);
-      console.log("📊 All form data:", formData);
-      console.log("👥 Group Info:", groupInfo);
+      console.log(" Assignment Payload:", payload);
+      console.log(" All form data:", formData);
+      console.log(" Group Info:", groupInfo);
 
       const res = await axiosInstance.post("/assign", payload);
 
@@ -290,7 +301,7 @@ const CreateAssignment = () => {
         toastError(res.data.Message || "Failed to assign tree");
       }
     } catch (err) {
-      console.error("❌ Assignment Error:", err.response?.data || err.message);
+      console.error(" Assignment Error:", err.response?.data || err.message);
       toastError(err.response?.data?.Message || "Failed to assign tree");
     } finally {
       setLoading(false);
@@ -344,7 +355,6 @@ const CreateAssignment = () => {
       options: states.map((s) => ({ value: s._id, label: s.name })),
       required: true,
       disabled: !formData.country,
-
     },
     {
       name: "city",
@@ -392,7 +402,7 @@ const CreateAssignment = () => {
           <h5 className="mb-0">Assign Trees to Group</h5>
           <button
             type="button"
-            className="btn btn-outline-secondary btn-sm"
+            className="btn btn-primary btn-sm"
             onClick={() => navigate("/manage-plantation/assignments")}
           >
             Back to Assignments
