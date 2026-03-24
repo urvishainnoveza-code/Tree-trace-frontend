@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../assets/logo.jpg";
-import "./layout.css";
-import { FaBell } from "react-icons/fa";
+import { FaBell, FaBars } from "react-icons/fa";
+import "../common-components/common.css";
 import axiosInstance from "../../utils/axiosInstance";
 
 const getStoredUser = () => {
@@ -14,28 +13,20 @@ const getStoredUser = () => {
   }
 };
 
-const Header = () => {
+const Header = ({ onSidebarToggle }) => {
   const navigate = useNavigate();
   const userType = localStorage.getItem("userType");
   const user = getStoredUser();
 
-  const profilePhoto = user?.profilePhoto;
-
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [showNotification, setShowNotification] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const notificationRef = useRef(null);
   const profileRef = useRef(null);
+  const profilePhoto = user?.profilePhoto;
 
-  // Logout
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate(userType === "superAdmin" ? "/" : "/user-login");
-  };
-
-  // Fetch notifications
   const fetchNotifications = useCallback(async () => {
     try {
       const res = await axiosInstance.get("/notifications");
@@ -52,29 +43,24 @@ const Header = () => {
     return () => clearInterval(interval);
   }, [fetchNotifications]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleOutsideClick = (event) => {
-      if (
-        notificationRef.current &&
-        !notificationRef.current.contains(event.target)
-      ) {
+      if (notificationRef.current && !notificationRef.current.contains(event.target))
         setShowNotification(false);
-      }
-
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
+      if (profileRef.current && !profileRef.current.contains(event.target))
         setShowProfileMenu(false);
-      }
     };
-
     document.addEventListener("mousedown", handleOutsideClick);
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
   const handleProfile = () => {
-    if (user?._id) {
-      navigate(`/user-profile/${user._id}`);
-    }
+    if (user?._id) navigate(`/user-profile/${user._id}`);
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate(userType === "superAdmin" ? "/" : "/user-login");
   };
 
   const markAsRead = async (id) => {
@@ -98,61 +84,47 @@ const Header = () => {
 
   return (
     <header className="header">
-      {/* LOGO */}
-      <div className="logo-section">
-        <img src={logo} alt="TreeTrace Logo" />
-        <span>TreeTrace Monitoring System</span>
-      </div>
+      {/* ✅ Hamburger — visible on MOBILE only (CSS hides on desktop) */}
+      <button className="hamburger-btn" onClick={onSidebarToggle} aria-label="Toggle sidebar">
+        <FaBars size={20} />
+      </button>
 
       <div className="header-actions">
-        {/* NOTIFICATION */}
-        <div className="notification-wrapper" ref={notificationRef}>
-          <FaBell
-            size={22}
-            style={{ cursor: "pointer" }}
-            onClick={() => setShowNotification(!showNotification)}
-          />
-
-          {unreadCount > 0 && (
-            <span className="notification-badge">{unreadCount}</span>
-          )}
-
-          {showNotification && (
-            <div className="notification-dropdown">
-              <div className="notification-dropdown-header">
-                <span>Notifications</span>
-
-                {unreadCount > 0 && (
-                  <button className="mark-all-read-btn" onClick={markAllAsRead}>
-                    Mark all as read
-                  </button>
-                )}
-              </div>
-
-              {notifications.length === 0 && (
-                <p className="notification-empty">No notifications</p>
-              )}
-
-              {notifications.map((n) => (
-                <div
-                  key={n._id}
-                  className="notification-item"
-                  onClick={() => markAsRead(n._id)}
-                >
-                  <p>{n.message}</p>
-                  <small>{new Date(n.createdAt).toLocaleString()}</small>
+        {userType === "user" && (
+          <div className="notification-wrapper" ref={notificationRef}>
+            <FaBell size={22} style={{ cursor: "pointer" }}
+              onClick={() => setShowNotification((prev) => !prev)} />
+            {unreadCount > 0 && (
+              <span className="notification-badge">{unreadCount}</span>
+            )}
+            {showNotification && (
+              <div className="notification-dropdown">
+                <div className="notification-dropdown-header">
+                  <span>Notifications</span>
+                  {unreadCount > 0 && (
+                    <button className="mark-all-read-btn" onClick={markAllAsRead}>
+                      Mark all as read
+                    </button>
+                  )}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                {notifications.length === 0 && (
+                  <p className="notification-empty">No notifications</p>
+                )}
+                {notifications.map((n) => (
+                  <div key={n._id}
+                    className={`notification-item ${n.isRead ? "read" : "unread"}`}
+                    onClick={() => markAsRead(n._id)}>
+                    <p>{n.message}</p>
+                    <small>{new Date(n.createdAt).toLocaleString()}</small>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
-        {/* PROFILE */}
         <div className="profile-wrapper" ref={profileRef}>
-          <div
-            className="profile-btn"
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
-          >
+          <div className="profile-btn" onClick={() => setShowProfileMenu((prev) => !prev)}>
             {profilePhoto ? (
               <img src={profilePhoto} alt="profile" className="profile-img" />
             ) : (
@@ -160,10 +132,8 @@ const Header = () => {
                 {user?.firstName?.charAt(0)?.toUpperCase() || "?"}
               </div>
             )}
-
             <span className="profile-name">{user?.firstName}</span>
           </div>
-
           {showProfileMenu && (
             <div className="profile-dropdown">
               <button onClick={handleProfile}>View Profile</button>

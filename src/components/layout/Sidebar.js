@@ -1,134 +1,66 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
-import "./layout.css";
+import { NavLink, useNavigate } from "react-router-dom";
+import logo from "../../assets/logo.png";
+import logoIcon from "../../assets/logo.png"; // same logo, shown small when collapsed
+import "../common-components/common.css";
+import {
+  MdDashboard,
+  MdPeople,
+  MdAssignment,
+  MdSettings,
+} from "react-icons/md";
+import { FaTree } from "react-icons/fa";
 
-const Sidebar = () => {
+const Sidebar = ({ open, onToggle }) => {
   const userType = localStorage.getItem("userType");
 
-  const navClass = ({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`;
+  const navClass = ({ isActive }) =>
+    `sidebar-link ${isActive ? "active" : ""}`;
+
+  const navItems =
+    userType === "superAdmin"
+      ? [
+          { to: "/admin-dashboard", icon: <MdDashboard size={20} />, label: "Dashboard" },
+          { to: "/manage-user", icon: <MdPeople size={20} />, label: "Manage User" },
+          { to: "/manage-plantation/assignments", icon: <MdAssignment size={20} />, label: "Tree Assignments" },
+          { to: "/tree-detail", icon: <FaTree size={18} />, label: "Tree Detail" },
+          { to: "/master", icon: <MdSettings size={20} />, label: "Master" },
+        ]
+      : [
+          { to: "/admin-dashboard", icon: <MdDashboard size={20} />, label: "Dashboard" },
+          { to: "/view-task", icon: <MdAssignment size={20} />, label: "My Tasks" },
+          { to: "/tree-detail", icon: <FaTree size={18} />, label: "Tree Detail" },
+          { to: "/groupMember", icon: <MdPeople size={20} />, label: "Group Members" },
+        ];
 
   return (
-    <aside className="sidebar">
-      <nav>
-        <NavLink to="/dashboard" className={navClass}>
-          Dashboard
-        </NavLink>
+    <aside className={`sidebar-fixed ${open ? "sidebar-full" : "sidebar-icon-only"}`}>
 
-        {userType === "superAdmin" && (
-          <>
-            <NavLink to="/master" className={navClass}>
-              Master
-            </NavLink>
+      {/* LOGO AREA — click to toggle */}
+      <div className="sidebar-logo-area" onClick={onToggle} title="Toggle sidebar">
+        <img src={logo} alt="Logo" className="sidebar-logo-full" />
+        {/* Icon-only mode shows a small version */}
+        <span className="sidebar-logo-icon">
+          <FaTree size={22} color="#fff" />
+        </span>
+      </div>
 
-            <NavLink to="/manage-user" className={navClass}>
-              Manage User
-            </NavLink>
-
-            <NavLink to="/manage-plantation/assignments" className={navClass}>
-              Tree Assignments
-            </NavLink>
-            <NavLink to="/tree-detail" className={navClass}>
-              Tree Detail
-            </NavLink>
-          </>
-        )}
-
-        {userType === "user" && (
-          <>
-            <NavLink to="/view-task" className={navClass}>
-              My Tasks
-            </NavLink>
-
-            <NavLink to="/tree-detail" className={navClass}>
-              Tree Detail
-            </NavLink>
-            <NavLink to="/groupMember" className={navClass}>
-              Group Members
-            </NavLink>
-          </>
-        )}
+      {/* NAV LINKS */}
+      <nav className="sidebar-nav">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={navClass}
+            title={!open ? item.label : ""}  // tooltip when collapsed
+          >
+            <span className="sidebar-icon">{item.icon}</span>
+            <span className="sidebar-label">{item.label}</span>
+          </NavLink>
+        ))}
       </nav>
     </aside>
   );
 };
 
 export default Sidebar;
-
-/*import React from "react";
-import { NavLink } from "react-router-dom";
-import "./layout.css";
-
-const Sidebar = () => {
-  const userType = localStorage.getItem("userType");
-
-  return (
-<aside className="sidebar">
-      <nav>
-
-        <NavLink
-          to="/dashboard"
-          className={({ isActive }) =>
-            `px-3 py-2 rounded ${isActive ? "bg-gray-600" : ""}`
-          }
-        >
-          Dashboard
-        </NavLink>
-
-        {userType === "superAdmin" && (
-          <>
-            <NavLink
-              to="/master"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded ${isActive ? "bg-gray-600" : ""}`
-              }
-            >
-              Master
-            </NavLink>
-
-            <NavLink
-              to="/manage-user"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded ${isActive ? "bg-gray-600" : ""}`
-              }
-            >
-              Manage User
-            </NavLink>
-
-            <NavLink
-              to="/tree-list"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded ${isActive ? "bg-gray-600" : ""}`
-              }
-            >
-              Tree List
-            </NavLink>
-          </>
-        )}
-
-        {userType === "user" && (
-          <>
-            <NavLink
-              to="/view-task"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded ${isActive ? "bg-gray-600" : ""}`
-              }
-            >
-              View Task
-            </NavLink>
-
-            <NavLink
-              to="/tree-detail"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded ${isActive ? "bg-gray-600" : ""}`
-              }
-            >
-              Tree Detail
-            </NavLink>
-          </>
-        )}
-      </nav>
-    </aside>
-  );
-};
-
-export default Sidebar;*/

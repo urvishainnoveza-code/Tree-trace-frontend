@@ -53,9 +53,9 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} /> {/* Admin login */}
-        <Route path="/otp" element={<Otp />} /> {/* OTP verification */}
-        <Route path="/signup" element={<Signup />} /> {/* Signup */}
+        <Route path="/" element={<Login />} /> 
+        <Route path="/otp" element={<Otp />} /> 
+        <Route path="/signup" element={<Signup />} />
         <Route
           path="/admin-dashboard"
           element={

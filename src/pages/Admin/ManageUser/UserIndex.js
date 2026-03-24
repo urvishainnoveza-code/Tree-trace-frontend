@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { validateForm as validateFormUtils } from "../../../utils/formUtils";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../../../utils/axiosInstance";
 import CommonTable from "../../../components/common-components/CommonTable";
 import CommonForm from "../../../components/common-components/CommonForm";
 import CommonFilter from "../../../components/common-components/CommonFilter";
 import { getUser, getUserType } from "../../../utils/auth";
-import "../../../components/layout/layout.css";
 import "../../../components/common-components/common.css";
 import {
   confirmDelete,
@@ -386,18 +386,25 @@ const UserIndex = () => {
     }
   };
 
+  // Validation rules for all required fields
+  const validationRules = {
+    firstName: { required: true },
+    lastName: { required: true },
+    email: { required: true, email: true },
+    phoneNo: { required: true, mobile: true, maxLength: 10 },
+    birthDate: { required: true },
+    gender: { required: true },
+    country: { required: true },
+    state: { required: true },
+    city: { required: true },
+    area: { required: true },
+    landmark: { required: true },
+  };
+
   const validateForm = () => {
-    const nextErrors = {};
-
-    if (!formData.firstName?.trim())
-      nextErrors.firstName = "First name is required";
-    if (!formData.lastName?.trim())
-      nextErrors.lastName = "Last name is required";
-    if (!formData.email?.trim()) nextErrors.email = "Email is required";
-    if (!formData.area) nextErrors.area = "Area is required";
-
-    setFormErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
+    const errors = validateFormUtils(formData, validationRules);
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleDelete = async (user) => {
@@ -429,6 +436,32 @@ const UserIndex = () => {
       setFormData((prev) => ({ ...prev, profilePhoto: file }));
       // setProfilePreview(file ? URL.createObjectURL(file) : null);
       return;
+    }
+
+    // Phone number: restrict to numeric and max 10 digits
+    if (name === "phoneNo") {
+      let newValue = value.replace(/[^0-9]/g, "").slice(0, 10);
+      setFormData((prev) => ({ ...prev, [name]: newValue }));
+      if (formErrors[name]) {
+        setFormErrors((prev) => ({ ...prev, [name]: "" }));
+      }
+      return;
+    }
+
+    // Birth date: prevent today or future
+    if (name === "birthDate") {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selected = new Date(value);
+      selected.setHours(0, 0, 0, 0);
+      if (selected >= today) {
+        setFormErrors((prev) => ({
+          ...prev,
+          birthDate: "Birth date cannot be today or in the future",
+        }));
+        setFormData((prev) => ({ ...prev, birthDate: "" }));
+        return;
+      }
     }
 
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -528,8 +561,6 @@ const UserIndex = () => {
         label: "First Name",
         type: "text",
         required: true,
-        
-        
       },
       {
         name: "lastName",
@@ -548,13 +579,19 @@ const UserIndex = () => {
         name: "phoneNo",
         label: "Phone",
         type: "text",
-        required:true,
+        required: true,
+        maxLength: 10,
+        inputMode: "numeric",
+        pattern: "[0-9]*",
+        onInput: (e) => {
+          e.target.value = e.target.value.replace(/[^0-9]/g, "").slice(0, 10);
+        },
       },
       {
         name: "birthDate",
         label: "Birth Date",
         type: "date",
-        required:true,
+        required: true,
       },
       {
         name: "gender",
@@ -564,7 +601,7 @@ const UserIndex = () => {
           { value: "male", label: "Male" },
           { value: "female", label: "Female" },
         ],
-        required:true,
+        required: true,
       },
       {
         name: "country",
@@ -602,19 +639,17 @@ const UserIndex = () => {
         name: "houseNo",
         label: "House No",
         type: "text",
-
       },
       {
         name: "societyName",
         label: "Society Name",
         type: "text",
-        
       },
       {
         name: "landmark",
         label: "Landmark",
         type: "text",
-        required:true,
+        required: true,
       },
       {
         name: "profilePhoto",
@@ -658,24 +693,21 @@ const UserIndex = () => {
       {isListPage && isSuperAdmin && (
         <>
           {/* Header with Add User button on right */}
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h3 className="commonindex-24">User Management</h3>
+          <div className="header-row-action">
+            <h4 className="commonindex-24">User Management</h4>
             <button
-              className="btn btn-primary add-btn common-index-font14"
+              className="btn btn-primary common-index-font14"
               onClick={openAddModal}
             >
               + Add User
             </button>
           </div>
-          {/* Cards for Total, Active, Inactive Users */}
-          <div className="d-flex gap-3 mb-4">
+          <div className="filter-bar-row">
             <div className="card flex-fill text-center p-3 user-count-card">
               <div className="user-count-label common-index-font14">
                 Total Users
               </div>
-              <div className="user-count-value">
-                {users.length}
-              </div>
+              <div className="user-count-value">{users.length}</div>
             </div>
             <div className="card flex-fill text-center p-3 user-count-card">
               <div className="user-count-label common-index-font14">
@@ -695,32 +727,30 @@ const UserIndex = () => {
             </div>
           </div>
           {/* Filter and Search row - all in one line */}
-          <div className="d-flex align-items-center gap-2 mb-3 flex-nowrap">
-            <div className="d-flex align-items-center gap-2 flex-nowrap w-100">
-              <input
-                type="text"
-                className="form-control common-search-input common-index-font14"
-                placeholder="Search user by name, email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ width: 220, minWidth: 180, fontSize: 14 }}
-              />
-              <CommonFilter
-                filters={filters}
-                dropdowns={{
-                  countryId: filterCountries,
-                  stateId: filterStates,
-                  cityId: filterCities,
-                  areaId: filterAreas,
-                }}
-                onFilterChange={handleFilterChange}
-                onClearFilters={handleClearFilters}
-                filtersToShow={["countryId", "stateId", "cityId", "areaId"]}
-                inputClassName="common-filter-select common-index-font14"
-                selectClassName="common-filter-select common-index-font14"
-                buttonClassName="common-filter-btn common-index-font14"
-              />
-            </div>
+          <div className="filter-bar-row">
+            <input
+              type="text"
+              className="form-control common-search-input common-index-font14"
+              placeholder="Search user by name, email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ width: 220, minWidth: 180, fontSize: 14 }}
+            />
+            <CommonFilter
+              filters={filters}
+              dropdowns={{
+                countryId: filterCountries,
+                stateId: filterStates,
+                cityId: filterCities,
+                areaId: filterAreas,
+              }}
+              onFilterChange={handleFilterChange}
+              onClearFilters={handleClearFilters}
+              filtersToShow={["countryId", "stateId", "cityId", "areaId"]}
+              inputClassName="common-filter-select common-index-font14"
+              selectClassName="common-filter-select common-index-font14"
+              buttonClassName="common-filter-btn common-index-font14"
+            />
           </div>
           {/* Table */}
           {loading ? (
@@ -775,7 +805,7 @@ const UserIndex = () => {
             <div className="d-flex gap-2">
               <button
                 type="button"
-                className="btn btn-outline-secondary btn-sm"
+                className="btn btn-primary btn-sm"
                 onClick={closeModal}
               >
                 Back to Users

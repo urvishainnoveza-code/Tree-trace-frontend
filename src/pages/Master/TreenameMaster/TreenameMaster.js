@@ -267,9 +267,9 @@ const TreenameManager = () => {
     <div className="p-4">
       <div className="mb-3">
         <div className="d-flex justify-content-between align-items-center">
-          <h3 className="mb-0 commonindex-26">Tree Name Management</h3>
+          <h4 className="mb-0 commonindex-26">Tree Name Management</h4>
           <button
-            className="btn btn-success add-user-btn common-index-font14"
+            className="btn btn-primary add-user-btn common-index-font14"
             onClick={handleAddClick}
           >
             + Add Tree Name

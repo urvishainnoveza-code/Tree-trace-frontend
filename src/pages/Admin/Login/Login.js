@@ -8,7 +8,7 @@ import {
   toastError,
   toastInfo,
 } from "../../../utils/alertHelper";
-import "./Auth.css";
+import "../../../components/common-components/common.css";
 function Login() {
   const navigate = useNavigate();
   const [locationAllowed, setLocationAllowed] = useState(null);
@@ -269,12 +269,12 @@ function Login() {
                     <svg
                       viewBox="0 0 24 24"
                       width="18"
-                      height="18"
+                      height="23"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M3 6.5L12 13L21 6.5"
+                        d="M2 6.5V17a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6.5M2 6.5l10 7 10-7M2 6.5h20"
                         stroke="currentColor"
                         strokeWidth="1.6"
                         strokeLinecap="round"
@@ -359,17 +359,6 @@ function Login() {
                     autoFocus
                     minLength="6"
                   />
-                </div>
-                <div className="forgot-row">
-                  <button
-                    type="button"
-                    className="auth-btn-link"
-                    onClick={() => {
-                      /* implement forgot */
-                    }}
-                  >
-                    Forgot Password?
-                  </button>
                 </div>
               </div>
               <button

@@ -16,7 +16,6 @@ const AssignmentIndex = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   // Removed unused totalRecords state
   const limit = parseInt(process.env.REACT_APP_PAGE_LIMIT || 10);
 
@@ -68,7 +67,6 @@ const AssignmentIndex = () => {
 
         if (res.data.Status === 1) {
           setAssignments(res.data.data || res.data.Data || []);
-          setTotalPages(res.data.TotalPages || res.data.totalPages || 1);
         } else {
           setAssignments([]);
         }
@@ -210,72 +208,50 @@ const AssignmentIndex = () => {
     },
   ];
 
-  const getActions = (row) => {
-    const actions = [];
-
-    actions.push({
-      label: "View Details",
-      onClick: () => handleViewDetail(row._id),
-      className: "btn btn-sm btn-info",
-    });
-
-    if (isSuperAdmin && row.status === "assigned") {
-      actions.push({
-        label: "Cancel",
-        onClick: () => handleCancelAssignment(row._id),
-        className: "btn btn-sm btn-danger",
-      });
-    }
-
-    return actions;
-  };
-
   return (
     <div className="container mt-4">
       {isSuperAdmin && (
         <>
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h3 className="commonindex-24">Tree Assignments</h3>
+          <div className="header-row-action">
+            <h4 className="commonindex-24">Tree Assignments</h4>
             <button
-              className="btn btn-success add-btn common-index-font14"
+              className="btn btn-primary common-index-font14"
               onClick={() => navigate("/manage-plantation/assign")}
             >
               + Assign Trees
             </button>
           </div>
-          <div className="d-flex align-items-center gap-2 mb-3 flex-nowrap">
-            <div className="d-flex align-items-center gap-2 flex-nowrap w-100">
-              <input
-                type="text"
-                className="form-control common-search-input common-index-font14"
-                placeholder="Search assignments..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ width: 220, minWidth: 180, fontSize: 14 }}
-              />
-              <CommonFilter
-                filters={filters}
-                dropdowns={{
-                  countryId: filterCountries,
-                  stateId: filterStates,
-                  cityId: filterCities,
-                  areaId: filterAreas,
-                  treeId: filterTrees,
-                }}
-                onFilterChange={handleFilterChange}
-                onClearFilters={handleClearFilters}
-                filtersToShow={[
-                  "countryId",
-                  "stateId",
-                  "cityId",
-                  "areaId",
-                  "treeId",
-                ]}
-                inputClassName="common-filter-select common-index-font14"
-                selectClassName="common-filter-select common-index-font14"
-                buttonClassName="common-filter-btn common-index-font14"
-              />
-            </div>
+          <div className="filter-bar-row">
+            <input
+              type="text"
+              className="form-control common-search-input common-index-font14"
+              placeholder="Search assignments..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ width: 220, minWidth: 180, fontSize: 14 }}
+            />
+            <CommonFilter
+              filters={filters}
+              dropdowns={{
+                countryId: filterCountries,
+                stateId: filterStates,
+                cityId: filterCities,
+                areaId: filterAreas,
+                treeId: filterTrees,
+              }}
+              onFilterChange={handleFilterChange}
+              onClearFilters={handleClearFilters}
+              filtersToShow={[
+                "countryId",
+                "stateId",
+                "cityId",
+                "areaId",
+                "treeId",
+              ]}
+              inputClassName="common-filter-select common-index-font14"
+              selectClassName="common-filter-select common-index-font14"
+              buttonClassName="common-filter-btn common-index-font14"
+            />
           </div>
         </>
       )}
@@ -283,18 +259,12 @@ const AssignmentIndex = () => {
       {/* Table */}
       <CommonTable
         title="Assignment List"
-        addLabel="+ Assign Trees"
         columns={tableColumns}
         data={assignments}
         loading={loading}
-        actions={getActions}
+        onView={(row) => handleViewDetail(row._id)}
+        onCancel={(row) => handleCancelAssignment(row._id)}
         onAdd={() => navigate("/manage-plantation/assign")}
-        pagination={{
-          currentPage,
-          totalPages,
-          onPageChange: setCurrentPage,
-          limit,
-        }}
       />
     </div>
   );

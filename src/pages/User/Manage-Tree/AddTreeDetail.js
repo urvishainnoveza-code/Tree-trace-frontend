@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { validateForm as validateFormUtils } from "../../../utils/formUtils";
 import CommonForm from "../../../components/common-components/CommonForm";
 import CommonModel from "../../../components/common-components/CommonModel";
 import axiosInstance from "../../../utils/axiosInstance";
@@ -23,6 +24,7 @@ const defaultData = {
 
 const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
   const [formData, setFormData] = useState(defaultData);
+  const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
@@ -141,7 +143,7 @@ const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
       type: "select",
       options: [
         { label: "Planted", value: "planted" },
-        { label: "Growing", value: "growing" },
+        { label: "dead", value: "dead" },
         { label: "Healthy", value: "healthy" },
         { label: "Diseased", value: "diseased" },
       ],
@@ -188,11 +190,36 @@ const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
         ...prev,
         [name]: value,
       }));
+      if (formErrors[name]) {
+        setFormErrors((prev) => ({ ...prev, [name]: "" }));
+      }
     }
+  };
+
+  // Validation rules for all required fields
+  const validationRules = {
+    assignmentId: { required: true },
+    address: { required: true },
+    plantedCount: { required: true, minLength: 1 },
+    cage: { required: true },
+    watering: { required: true },
+    fertilizer: { required: true },
   };
 
   const handleSubmit = async () => {
     setLoading(true);
+    setFormErrors({});
+    // Validate fields
+    const errors = validateFormUtils(formData, validationRules);
+    if (formData.plantedCount && Number(formData.plantedCount) <= 0) {
+      errors.plantedCount = "Planted count must be greater than 0";
+    }
+    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setLoading(false);
+      return;
+    }
+
     const {
       assignmentId,
       plantedCount,
@@ -201,18 +228,6 @@ const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
       fertilizer,
       ...otherData
     } = formData;
-
-    if (!assignmentId) {
-      toastError("Assignment ID is missing");
-      setLoading(false);
-      return;
-    }
-
-    if (!plantedCount || plantedCount <= 0) {
-      toastError("Planted count must be greater than 0");
-      setLoading(false);
-      return;
-    }
 
     // Always fetch latest location for plantation (never use login or localStorage location)
     if (!("geolocation" in navigator)) {
@@ -319,7 +334,12 @@ const AddTreeDetail = ({ show, onClose, onSaved, initialData }) => {
       saveText={loading ? "Saving..." : "Save Plantation"}
       isSaving={loading}
     >
-      <CommonForm fields={fields} formData={formData} onChange={handleChange} />
+      <CommonForm
+        fields={fields}
+        formData={formData}
+        onChange={handleChange}
+        errors={formErrors}
+      />
 
       <div className="alert alert-info mt-2 py-2">
         <small>

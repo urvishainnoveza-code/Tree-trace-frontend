@@ -81,6 +81,27 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
       setPreview(value ? URL.createObjectURL(value) : null);
       return;
     }
+
+    // Phone number: restrict to numeric and max 10 digits
+    if (name === "phoneNo") {
+      let newValue = value.replace(/[^0-9]/g, "").slice(0, 10);
+      setValues((prev) => ({ ...prev, [name]: newValue }));
+      return;
+    }
+
+    // Birth date: prevent today or future
+    if (name === "birthDate") {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selected = new Date(value);
+      selected.setHours(0, 0, 0, 0);
+      if (selected >= today) {
+        // Optionally show error UI here
+        setValues((prev) => ({ ...prev, birthDate: "" }));
+        return;
+      }
+    }
+
     setValues((prev) => {
       const next = { ...prev, [name]: value };
       if (next.country !== prev.country) {
@@ -142,7 +163,7 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
         }
       });
       formData.append("userType", "user");
-      const res = await axiosInstance.post("/users", formData,payload, {
+      const res = await axiosInstance.post("/users", formData, payload, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -171,7 +192,20 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
         onClose && onClose();
       }
     } catch (err) {
-      setError(err.response?.data?.Message || "Failed to create user");
+      const backendMsg = err.response?.data?.Message;
+      if (
+        backendMsg === "User already exists" ||
+        backendMsg?.toLowerCase().includes("email")
+      ) {
+        setError("Email already exists");
+      } else if (
+        backendMsg === "User with this phone number already exists" ||
+        backendMsg?.toLowerCase().includes("phone")
+      ) {
+        setError("Phone number already exists");
+      } else {
+        setError(backendMsg || "Failed to create user");
+      }
       console.error("Add User error:", err);
     } finally {
       setLoading(false);
@@ -267,7 +301,7 @@ const AddUser = ({ show, onClose, isAdmin = false, onSuccess, onSaved }) => {
       name: "profilePhoto",
       type: "file",
       colClass: "col-md-12",
-    }
+    },
   ];
 
   return (

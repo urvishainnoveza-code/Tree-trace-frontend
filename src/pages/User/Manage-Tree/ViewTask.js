@@ -186,7 +186,6 @@ const ViewTask = () => {
 
   useEffect(() => {
     fetchUserTasks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -260,10 +259,11 @@ const ViewTask = () => {
 
   return (
     <div className="p-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="header-row-action">
         <h3 className="commonindex-24">Assign Task</h3>
       </div>
-      <div className="d-flex align-items-center gap-2 mb-3 flex-nowrap">
+
+      <div className="filter-bar-row">
         <input
           type="text"
           className="form-control common-search-input common-index-font14"
@@ -299,66 +299,113 @@ const ViewTask = () => {
           { label: "City", key: "city.name" },
           { label: "Area", key: "area.name" },
           { label: "Group", key: "group.name" },
+
+          // STATUS (UNCHANGED)
           {
             label: "Status",
             key: "status",
             render: (item) => {
-              const statusColors = {
-                assigned: "warning",
-                completed: "success",
-                cancelled: "danger",
+              let style = {
+                display: "inline-block",
+                borderRadius: 50,
+                padding: "2px 12px",
+                fontSize: 14,
               };
-              const statusLabels = {
-                assigned: "Assigned",
-                completed: "Completed",
-                cancelled: "Cancelled",
-              };
-              return (
-                <span
-                  className={`badge bg-${statusColors[item.status] || "secondary"}`}
-                >
-                  {statusLabels[item.status] || item.status}
-                </span>
-              );
+
+              let label = "";
+
+              if (item.status === "assigned") {
+                style = {
+                  ...style,
+                  border: "1px solid #ffe066",
+                  background: "#fffbe6",
+                  color: "#b38600",
+                };
+                label = "Assigned";
+              } else if (item.status === "completed") {
+                style = {
+                  ...style,
+                  border: "1px solid #dbf4e4",
+                  background: "#e6fff3",
+                  color: "#146c43",
+                };
+                label = "Completed";
+              } else if (item.status === "cancelled") {
+                style = {
+                  ...style,
+                  border: "1px solid #ffb3b3",
+                  background: "#ffeaea",
+                  color: "#b30000",
+                };
+                label = "Cancelled";
+              }
+
+              return <span style={style}>{label}</span>;
             },
           },
+
+          // ✅ ACTION UPDATED ONLY
           {
             label: "Action",
             key: "action",
             render: (item) => {
               const remaining =
                 (item.count || 0) - (item.totalPlantedCount || 0);
+
               const isCancelled = item.status === "cancelled";
               const isCompleted = item.status === "completed" || remaining <= 0;
 
+              let style = {
+                display: "inline-block",
+                borderRadius: 50,
+                padding: "2px 12px",
+                fontSize: 14,
+
+                cursor: "pointer",
+              };
+
+              let label = "";
+
+              if (isCancelled) {
+                style = {
+                  ...style,
+                  border: "1px solid #ffb3b3",
+                  background: "#ffeaea",
+                  color: "#b30000",
+                  cursor: "not-allowed",
+                };
+                label = "Cancelled";
+              } else if (isCompleted) {
+                style = {
+                  ...style,
+                  border: "1px solid #dbf4e4",
+                  background: "#e6fff3",
+                  color: "#146c43",
+                  cursor: "not-allowed",
+                };
+                label = "Completed";
+              } else {
+                style = {
+                  ...style,
+                  border: "1px solid #dbf4e4",
+                  background: "#e6fff3",
+                  color: "#146c43",
+                };
+                label = "Plant";
+              }
+
               return (
-                <button
-                  className={`btn btn-sm ${
-                    isCancelled
-                      ? "btn-danger"
-                      : isCompleted
-                        ? "btn-secondary"
-                        : "btn-success"
-                  }`}
+                <span
+                  style={style}
                   onClick={() => {
-                    setSelectedTask(item);
-                    setShowAddTreeDetail(true);
+                    if (!isCancelled && !isCompleted) {
+                      setSelectedTask(item);
+                      setShowAddTreeDetail(true);
+                    }
                   }}
-                  disabled={isCompleted || isCancelled}
-                  title={
-                    isCancelled
-                      ? "Assignment cancelled"
-                      : isCompleted
-                        ? "All trees planted"
-                        : `${remaining} trees remaining`
-                  }
                 >
-                  {isCancelled
-                    ? "Cancelled"
-                    : isCompleted
-                      ? "Completed"
-                      : "Plant"}
-                </button>
+                  {label}
+                </span>
               );
             },
           },
@@ -385,7 +432,7 @@ const ViewTask = () => {
           setShowAddTreeDetail(false);
           setSelectedTask(null);
         }}
-        onSaved={(newPlantation) => {
+        onSaved={() => {
           setShowAddTreeDetail(false);
           setSelectedTask(null);
           fetchUserTasks();

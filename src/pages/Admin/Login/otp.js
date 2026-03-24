@@ -7,7 +7,7 @@ import {
   toastError,
   toastInfo,
 } from "../../../utils/alertHelper";
-import "./Auth.css";
+import "../../../components/common-components/common.css";
 
 function Otp() {
   const [otp, setOtp] = useState("");

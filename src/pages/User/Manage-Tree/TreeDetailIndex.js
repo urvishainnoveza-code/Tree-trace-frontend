@@ -321,11 +321,11 @@ const ViewTreeDetail = () => {
   ];
 
   return (
-    <div className="p-4">
-      <div className="d-flex justify-content-between mb-3 align-items-center">
-        <h2 className="commonindex-24">Tree Detail List</h2>
+    <div className="container mt-4">
+      <div className="header-row-action">
+        <h4 className="commonindex-24">Tree Detail List</h4>
       </div>
-      <div className="d-flex align-items-center gap-2 mb-3 flex-nowrap">
+      <div className="filter-bar-row">
         <input
           type="text"
           className="form-control common-search-input common-index-font14"

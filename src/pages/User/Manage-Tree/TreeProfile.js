@@ -1,54 +1,49 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../../../utils/axiosInstance";
+import "./TreeProfile.css";
 
 const TreeProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [tree, setTree] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchTreeProfile = async () => {
+    const fetchTree = async () => {
       try {
-        setLoading(true);
-        setError("");
-
         const res = await axiosInstance.get(`/plantation/${id}`);
-        const payload = res.data || {};
+        const data = res.data;
 
-        if ((payload.Status ?? payload.status) === 1) {
-          setTree(payload.Plantation || payload.plantation || null);
+        if ((data.Status ?? data.status) === 1) {
+          setTree(data.Plantation || data.plantation);
         } else {
-          setError(payload.Message || "Failed to fetch tree profile");
+          setError(data.Message || "Failed to fetch");
         }
       } catch (err) {
-        setError(err.response?.data?.Message || "Failed to fetch tree profile");
+        setError(err.response?.data?.Message || "Error loading data");
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) {
-      fetchTreeProfile();
-    }
+    if (id) fetchTree();
   }, [id]);
 
   if (loading) {
     return (
-      <div className="container mt-5 text-center">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+      <div className="tp-container text-center">
+        <div className="spinner-border text-success" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mt-4">
-        <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>
+      <div className="tp-container">
+        <button className="btn btn-primary mb-3" onClick={() => navigate(-1)}>
           ← Back
         </button>
         <div className="alert alert-danger">{error}</div>
@@ -56,154 +51,146 @@ const TreeProfile = () => {
     );
   }
 
-  if (!tree) {
-    return (
-      <div className="container mt-4">
-        <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>
-          ← Back
-        </button>
-        <div className="alert alert-warning">Tree profile not found</div>
-      </div>
-    );
-  }
+  if (!tree) return null;
 
-  const planterName =
-    tree.plantedBy?.firstName || tree.plantedBy?.lastName
-      ? `${tree.plantedBy?.firstName || ""} ${tree.plantedBy?.lastName || ""}`.trim()
-      : "-";
+  const planterName = `${tree?.plantedBy?.firstName || ""} ${
+    tree?.plantedBy?.lastName || ""
+  }`.trim();
+
+  const treeName = tree.assign?.treeName?.name || "-";
 
   return (
-    <div className="container mt-4">
-      <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>
+    <div className="tp-container container-fluid">
+      {/* Back */}
+      <button className="btn btn-primary mb-3" onClick={() => navigate(-1)}>
         ← Back
       </button>
 
-      <div className="card">
-        <div className="card-header">
-          <h4 className="mb-0">Tree Profile</h4>
-        </div>
+      <h4 className="commonindex-24">Tree Profile</h4>
 
-        <div className="card-body">
-          <div className="row mb-3">
-            <div className="col-md-6">
-              <h6 className="text-muted">Tree Name</h6>
-              <p>{tree.assign?.treeName?.name || "-"}</p>
-            </div>
-            <div className="col-md-6">
-              <h6 className="text-muted">Planted By</h6>
-              <p>{planterName}</p>
-            </div>
+      {/* BASIC INFO */}
+      <div className="card tp-card mb-3">
+        <div className="tp-card-title">Basic Information</div>
+
+        <div className="row">
+          <div className="col-md-3">
+            <small className="text-muted">Tree Name</small>
+            <h5>{treeName}</h5>
           </div>
 
-          <div className="row mb-3">
-            <div className="col-md-3">
-              <h6 className="text-muted">Country</h6>
-              <p>{tree.assign?.country?.name || "-"}</p>
-            </div>
-            <div className="col-md-3">
-              <h6 className="text-muted">State</h6>
-              <p>{tree.assign?.state?.name || "-"}</p>
-            </div>
-            <div className="col-md-3">
-              <h6 className="text-muted">City</h6>
-              <p>{tree.assign?.city?.name || "-"}</p>
-            </div>
-            <div className="col-md-3">
-              <h6 className="text-muted">Area</h6>
-              <p>{tree.assign?.area?.name || "-"}</p>
-            </div>
-          </div>
-
-          <div className="row mb-3">
-            <div className="col-md-6">
-              <h6 className="text-muted">Address</h6>
-              <p>{tree.address || "-"}</p>
-            </div>
-            <div className="col-md-3">
-              <h6 className="text-muted">Planted Count</h6>
-              <p>{tree.plantedCount ?? "-"}</p>
-            </div>
-            <div className="col-md-3">
-              <h6 className="text-muted">Health Status</h6>
-              <p className="text-capitalize">{tree.healthStatus || "-"}</p>
-            </div>
-          </div>
-
-          <div className="row mb-3">
-            <div className="col-md-3">
-              <h6 className="text-muted">Cage</h6>
-              <p>{tree.cage ? "Yes" : "No"}</p>
-            </div>
-            <div className="col-md-3">
-              <h6 className="text-muted">Watering</h6>
-              <p>{tree.watering ? "Yes" : "No"}</p>
-              {tree.lastWateredDate && (
-                <small className="text-muted">
-                  Last Watered:{" "}
-                  {new Date(tree.lastWateredDate).toLocaleString()}
-                </small>
-              )}
-            </div>
-            <div className="col-md-3">
-              <h6 className="text-muted">Fertilizer</h6>
-              <p>{tree.fertilizer ? "Yes" : "No"}</p>
-              {tree.lastFertilizerDate && (
-                <small className="text-muted">
-                  Last Fertilizer:{" "}
-                  {new Date(tree.lastFertilizerDate).toLocaleString()}
-                </small>
-              )}
-            </div>
-            <div className="col-md-3">
-              <h6 className="text-muted">Age</h6>
-              <p>{tree.age || "-"}</p>
-            </div>
-          </div>
-
-          <div className="row mb-3">
-            <div className="col-md-6">
-              <h6 className="text-muted">Fertilizer Detail</h6>
-              <p>{tree.fertilizerDetail || "-"}</p>
-            </div>
-            <div className="col-md-6">
-              <h6 className="text-muted">Plantation Date</h6>
-              <p>
-                {tree.plantationDate
-                  ? new Date(tree.plantationDate).toLocaleDateString()
-                  : "-"}
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <h6 className="text-muted">Images</h6>
-            {Array.isArray(tree.images) && tree.images.length > 0 ? (
-              <div className="d-flex gap-2 flex-wrap">
-                {tree.images.map((imgPath, index) => (
-                  <img
-                    key={`${imgPath}-${index}`}
-                    src={
-                      imgPath.startsWith("http")
-                        ? imgPath
-                        : `${axiosInstance.defaults.baseURL}${imgPath}`
-                    }
-                    alt={`tree-${index}`}
-                    style={{
-                      width: "120px",
-                      height: "120px",
-                      objectFit: "cover",
-                      borderRadius: "6px",
-                      border: "1px solid #dee2e6",
-                    }}
-                  />
-                ))}
+          <div className="col-md-3">
+            <small className="text-muted">Planted By</small>
+            <div className="tp-planter">
+              <div className="tp-avatar">
+                {planterName ? planterName[0].toUpperCase() : "?"}
               </div>
-            ) : (
-              <p className="mb-0">No images uploaded</p>
-            )}
+              <span>{planterName || "-"}</span>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <small className="text-muted">Health Status</small>
+            <div>
+              <span
+                className={`badge tp-health ${
+                  tree.healthStatus === "healthy"
+                    ? "bg-success-subtle text-success"
+                    : "bg-danger-subtle text-danger"
+                }`}
+              >
+                {tree.healthStatus || "-"}
+              </span>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <small className="text-muted">Planted Count</small>
+            <div>{tree.plantedCount || "-"}</div>
           </div>
         </div>
       </div>
+
+      {/* LOCATION */}
+      <div className="card tp-card mb-3">
+        <div className="tp-card-title">Location</div>
+
+        <div className="d-flex flex-wrap gap-2 mb-2">
+          {["country", "state", "city", "area"].map((key) => (
+            <div key={key} className="tp-chip">
+              <small className="text-muted">{key}</small>
+              <div>{tree.assign?.[key]?.name || "-"}</div>
+            </div>
+          ))}
+        </div>
+
+        <small className="text-muted">Address</small>
+        <div>{tree.address || "-"}</div>
+      </div>
+
+      {/* CARE */}
+      <div className="card tp-card mb-3">
+        <div className="tp-card-title">Care & Maintenance</div>
+
+        <div className="row g-2">
+          <div className="col-md-3">
+            <div className="tp-care-box">
+              🛡️ <br />
+              <small>Cage</small>
+              <div>{tree.cage ? "Yes" : "No"}</div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="tp-care-box">
+              💧 <br />
+              <small>Watering</small>
+              <div>{tree.watering ? "Yes" : "No"}</div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="tp-care-box">
+              🌱 <br />
+              <small>Fertilizer</small>
+              <div>{tree.fertilizer ? "Yes" : "No"}</div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="tp-care-box gold">
+              ⏳ <br />
+              <small>Age</small>
+              <div>{tree.age || "-"}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* IMAGES */}
+      <div className="card tp-card mb-3">
+        <div className="tp-card-title">Images</div>
+
+        <div className="d-flex flex-wrap gap-2">
+          {tree.images?.length ? (
+            tree.images.map((img, i) => (
+              <img
+                key={i}
+                className="tp-img"
+                src={
+                  img.startsWith("http")
+                    ? img
+                    : `${axiosInstance.defaults.baseURL}${img}`
+                }
+                alt=""
+              />
+            ))
+          ) : (
+            <p className="text-muted">No images uploaded</p>
+          )}
+        </div>
+      </div>
+
+      {/* FOOTER */}
     </div>
   );
 };
