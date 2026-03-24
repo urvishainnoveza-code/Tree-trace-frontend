@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../../../utils/axiosInstance";
-import "./TreeProfile.css";
-
+//import "./TreeProfile.css";
+import "../../../components/common-components/common.css";
 const TreeProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();

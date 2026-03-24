@@ -1,7 +1,6 @@
 import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import logoIcon from "../../assets/logo.png"; // same logo, shown small when collapsed
 import "../common-components/common.css";
 import {
   MdDashboard,
@@ -14,30 +13,66 @@ import { FaTree } from "react-icons/fa";
 const Sidebar = ({ open, onToggle }) => {
   const userType = localStorage.getItem("userType");
 
-  const navClass = ({ isActive }) =>
-    `sidebar-link ${isActive ? "active" : ""}`;
+  const navClass = ({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`;
 
   const navItems =
     userType === "superAdmin"
       ? [
-          { to: "/admin-dashboard", icon: <MdDashboard size={20} />, label: "Dashboard" },
-          { to: "/manage-user", icon: <MdPeople size={20} />, label: "Manage User" },
-          { to: "/manage-plantation/assignments", icon: <MdAssignment size={20} />, label: "Tree Assignments" },
-          { to: "/tree-detail", icon: <FaTree size={18} />, label: "Tree Detail" },
+          {
+            to: "/admin-dashboard",
+            icon: <MdDashboard size={20} />,
+            label: "Dashboard",
+          },
+          {
+            to: "/manage-user",
+            icon: <MdPeople size={20} />,
+            label: "Manage User",
+          },
+          {
+            to: "/manage-plantation/assignments",
+            icon: <MdAssignment size={20} />,
+            label: "Tree Assignments",
+          },
+          {
+            to: "/tree-detail",
+            icon: <FaTree size={18} />,
+            label: "Tree Detail",
+          },
           { to: "/master", icon: <MdSettings size={20} />, label: "Master" },
         ]
       : [
-          { to: "/admin-dashboard", icon: <MdDashboard size={20} />, label: "Dashboard" },
-          { to: "/view-task", icon: <MdAssignment size={20} />, label: "My Tasks" },
-          { to: "/tree-detail", icon: <FaTree size={18} />, label: "Tree Detail" },
-          { to: "/groupMember", icon: <MdPeople size={20} />, label: "Group Members" },
+          {
+            to: "/admin-dashboard",
+            icon: <MdDashboard size={20} />,
+            label: "Dashboard",
+          },
+          {
+            to: "/view-task",
+            icon: <MdAssignment size={20} />,
+            label: "My Tasks",
+          },
+          {
+            to: "/tree-detail",
+            icon: <FaTree size={18} />,
+            label: "Tree Detail",
+          },
+          {
+            to: "/groupMember",
+            icon: <MdPeople size={20} />,
+            label: "Group Members",
+          },
         ];
 
   return (
-    <aside className={`sidebar-fixed ${open ? "sidebar-full" : "sidebar-icon-only"}`}>
-
+    <aside
+      className={`sidebar-fixed ${open ? "sidebar-full" : "sidebar-icon-only"}`}
+    >
       {/* LOGO AREA — click to toggle */}
-      <div className="sidebar-logo-area" onClick={onToggle} title="Toggle sidebar">
+      <div
+        className="sidebar-logo-area"
+        onClick={onToggle}
+        title="Toggle sidebar"
+      >
         <img src={logo} alt="Logo" className="sidebar-logo-full" />
         {/* Icon-only mode shows a small version */}
         <span className="sidebar-logo-icon">
@@ -52,7 +87,7 @@ const Sidebar = ({ open, onToggle }) => {
             key={item.to}
             to={item.to}
             className={navClass}
-            title={!open ? item.label : ""}  // tooltip when collapsed
+            title={!open ? item.label : ""} // tooltip when collapsed
           >
             <span className="sidebar-icon">{item.icon}</span>
             <span className="sidebar-label">{item.label}</span>
