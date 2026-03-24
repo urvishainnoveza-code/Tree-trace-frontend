@@ -15,7 +15,7 @@ const AssignmentDetail = () => {
   const [assignment, setAssignment] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchAssignmentDetail = async () => {
+  const fetchAssignmentDetail = React.useCallback(async () => {
     setLoading(true);
     try {
       const res = await axiosInstance.get(`/assign/${id}`);
@@ -31,11 +31,12 @@ const AssignmentDetail = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, navigate]);
 
   useEffect(() => {
     fetchAssignmentDetail();
-  }, [id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, fetchAssignmentDetail]);
 
   const handleCancelAssignment = async () => {
     if (!window.confirm("Cancel this assignment?")) return;
@@ -62,7 +63,7 @@ const AssignmentDetail = () => {
 
   if (!assignment) return null;
 
-  const userCount = assignment.group?.users?.length || 0;
+  // userCount removed as it was unused
 
   return (
     <div className="ad-container container-fluid">
