@@ -1,10 +1,8 @@
 /* ====================== PAGINATION (Enhanced) ====================== */
+
 .table-pagination-card {
-  border-radius: 16px;
-  background: #fff;
+ 
   margin-bottom: 32px;
-  box-shadow: 0 2px 12px rgba(60, 60, 60, 0.04);
-  border: 1.5px solid #e0e0e0;
   padding-bottom: 0;
 }
 
@@ -15,10 +13,11 @@
   gap: 0;
   width: 100%;
   background: #fff;
+  border: 1px solid #e0e0e0;
   border-radius: 0 0 16px 16px;
   padding: 12px 18px 12px 18px;
   flex-wrap: wrap;
-  border-top: 1.5px solid #e0e0e0;
+  border-top: none;
   font-size: 15px;
 }
 
@@ -552,11 +551,6 @@ body {
   font-weight: bold;
 }
 
-.profile-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: #023002;
-}
 
 .profile-dropdown {
   position: fixed;
@@ -790,24 +784,20 @@ body {
   background: transparent;
   border: 1px solid #e0e0e0;
   scrollbar-width: thin;
+  background-color: #ffffff;
 }
 
 .table {
-  border-radius: 12px;
+  border-radius: 12px 12px 12px  12px;
   background: #fff;
   overflow: hidden;
-  border: none;
+  border: 1px solid #e0e0e0;
   border-collapse: separate;
   border-spacing: 0;
   margin-bottom: 0;
   font-size: 14px;
   table-layout: auto;
   width: 100% !important;
-}
-
-table.align-middle.mb-0.table.table-bordered.table-hover {
-  border-radius: 16px;
-  border:1px solid #e0e0e0;
 }
 
 .table th,
@@ -845,30 +835,11 @@ table.align-middle.mb-0.table.table-bordered.table-hover {
   transition: background 0.2s;
 }
 
-.table-pagination-card {
-  border-radius: 16px;
-  background: #fff;
-  margin-bottom: 32px;
-}
-
 td.d-flex {
   justify-content: center;
 }
 
 /* ====================== PAGINATION==== */
-.pagination-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0;
-  width: 100%;
-  background: #fff;
-  border-radius: 0 0 16px 16px;
-  padding: 10px;
-  flex-wrap: nowrap;
-  border: 1.5px solid #e0e0e0;
-  border-top: none;
-}
 
 .pagination-bar > .pagination-rows {
   flex: 0 0 auto;
@@ -1164,7 +1135,7 @@ select:invalid {
   background-position: right 0.75rem center;
   background-size: 16px 12px;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-  border: 1px solid #e3e7ee;
+  border: 1px solid #dee2e6;
   border-radius: 50px !important;
   transition: border-color 0.15s ease-in-out;
   height: 40px;
@@ -1196,7 +1167,7 @@ select:invalid {
 /* Custom ERP Dropdown */
 .customDropDown .select2-container--default .select2-selection--single {
   height: 44.5px;
-  border: 1px solid #e3e6f0;
+  border: 1px solid #dee2e6;
   outline: none;
   background-color: #fff;
   border-radius: 50px !important;
@@ -2971,7 +2942,6 @@ select:invalid {
   padding: 28px;
   background: #fff;
   border: 1px solid #e5dede;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
 }
 
 /* ================================================================
@@ -3020,8 +2990,8 @@ select:invalid {
 }
 .profile-name {
   margin: 0;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 500;
   color: #1a2e1e;
   word-break: break-word;
 }

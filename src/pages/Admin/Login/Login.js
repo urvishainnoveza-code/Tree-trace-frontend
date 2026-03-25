@@ -269,7 +269,7 @@ function Login() {
                     <svg
                       viewBox="0 0 24 24"
                       width="18"
-                      height="23"
+                      height="23x"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
