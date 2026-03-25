@@ -414,7 +414,6 @@ function UserDashboard() {
           </div>
           <span className="ud-sec-badge">{totalGroupMembers} Members</span>
         </div>
-
         <table class="table table-bordered table-hover align-middle mb-0">
           <thead className="table-light">
             <tr>

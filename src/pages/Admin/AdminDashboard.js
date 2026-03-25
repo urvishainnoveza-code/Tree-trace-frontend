@@ -51,6 +51,7 @@ function AdminDashboard() {
               lat: p.location.coordinates[1],
               lng: p.location.coordinates[0],
               count: p.plantedCount,
+              healthStatus: p.healthStatus || "planted",
               location: p.address || p.assign?.area?.name || "Unknown",
               popup: `ID: ${p._id}<br/>Date: ${new Date(p.plantationDate).toLocaleString()}<br/>Count: ${p.plantedCount}`,
             }))
