@@ -67,7 +67,14 @@ function Login() {
     const auth = getAuth();
     if (auth?.token && auth?.user) {
       const role = auth.user.role?.name;
-      navigate(role === "superAdmin" ? "/admin-dashboard" : "/user-dashboard");
+      const userType = auth.user.userType;
+      if (role === "superAdmin") {
+        navigate("/admin-dashboard");
+      } else if (userType === "donor") {
+        navigate("/donor-dashboard");
+      } else {
+        navigate("/user-dashboard");
+      }
     }
   }, [navigate]);
 
@@ -115,15 +122,15 @@ function Login() {
         setAuth(UserToken, user);
         // Do NOT store location for later use. Only use live GPS for login validation.
         toastSuccess("Login successful!");
-        setTimeout(
-          () =>
-            navigate(
-              user.role?.name === "superAdmin"
-                ? "/admin-dashboard"
-                : "/user-dashboard",
-            ),
-          500,
-        );
+        setTimeout(() => {
+          if (user.role?.name === "superAdmin") {
+            navigate("/admin-dashboard");
+          } else if (user.userType === "donor") {
+            navigate("/donor-dashboard");
+          } else {
+            navigate("/user-dashboard");
+          }
+        }, 500);
       } else {
         toastError(Message || "Invalid response from server");
       }

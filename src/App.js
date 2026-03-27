@@ -1,5 +1,6 @@
 //import "./App.css";
 
+
 import "./assets/styles/global.css";
 import {
   BrowserRouter as Router,
@@ -18,6 +19,9 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import UserIndex from "./pages/Admin/ManageUser/UserIndex";
 
 import UserDashboard from "./pages/User/UserDashboard";
+import DonorDashboard from "./pages/User/DonorDashboard";
+import DonateTree from "./pages/User/DonateTree";
+import DonationIndex from "./pages/User/DonationIndex";
 
 import AddTree from "./pages/Admin/manage-plantation/AddTree";
 import MasterSetting from "./pages/Master/MasterSetting";
@@ -53,8 +57,17 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} /> 
-        <Route path="/otp" element={<Otp />} /> 
+        <Route
+          path="/donor-index"
+          element={
+            <ProtectedRoute>
+              <DonationIndex />
+            </ProtectedRoute>
+          }
+        />
+    
+        <Route path="/" element={<Login />} />
+        <Route path="/otp" element={<Otp />} />
         <Route path="/signup" element={<Signup />} />
         <Route
           path="/admin-dashboard"
@@ -106,10 +119,43 @@ function App() {
           }
         />
         <Route
+          path="/donor-dashboard"
+          element={
+            <ProtectedRoute role="donor">
+              <DonorDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/donate-tree"
+          element={
+            <ProtectedRoute role="donor">
+              <DonateTree />
+            </ProtectedRoute>
+          }
+        />
+    
+        <Route
           path="/groupMember"
           element={
             <ProtectedRoute role="user">
               <GroupMembers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/donor-dashboard"
+          element={
+            <ProtectedRoute role="user">
+              <DonorDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/donate-tree"
+          element={
+            <ProtectedRoute role="user">
+              <DonateTree />
             </ProtectedRoute>
           }
         />
@@ -122,7 +168,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-       
+
         <Route
           path="/view-task"
           element={

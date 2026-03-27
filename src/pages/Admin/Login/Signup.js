@@ -17,6 +17,7 @@ function Signup() {
     lastName: "",
     email: "",
     phoneNo: "",
+    userType: "user", // default to user
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -74,6 +75,7 @@ function Signup() {
       const normalizedData = {
         ...formData,
         email: formData.email.toLowerCase().trim(),
+        type: formData.userType, // send as 'type' to backend
       };
 
       const response = await axiosInstance.post(
@@ -215,6 +217,23 @@ function Signup() {
                   />
                 </div>
               </div>
+            </div>
+
+            <div className="auth-form-group">
+              <label className="auth-label">
+                Register As <span className="auth-required">*</span>
+              </label>
+              <select
+                name="userType"
+                value={formData.userType}
+                onChange={handleChange}
+                className="auth-input"
+                disabled={isSubmitting}
+                required
+              >
+                <option value="user">User (Field Staff)</option>
+                <option value="donor">Donor</option>
+              </select>
             </div>
 
             <div className="auth-form-group">

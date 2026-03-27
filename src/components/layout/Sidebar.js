@@ -15,53 +15,73 @@ const Sidebar = ({ open, onToggle }) => {
 
   const navClass = ({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`;
 
-  const navItems =
-    userType === "superAdmin"
-      ? [
-          {
-            to: "/admin-dashboard",
-            icon: <MdDashboard size={20} />,
-            label: "Dashboard",
-          },
-          {
-            to: "/manage-user",
-            icon: <MdPeople size={20} />,
-            label: "Manage User",
-          },
-          {
-            to: "/manage-plantation/assignments",
-            icon: <MdAssignment size={20} />,
-            label: "Tree Assignments",
-          },
-          {
-            to: "/tree-detail",
-            icon: <FaTree size={18} />,
-            label: "Tree Detail",
-          },
-          { to: "/master", icon: <MdSettings size={20} />, label: "Master" },
-        ]
-      : [
-          {
-            to: "/admin-dashboard",
-            icon: <MdDashboard size={20} />,
-            label: "Dashboard",
-          },
-          {
-            to: "/view-task",
-            icon: <MdAssignment size={20} />,
-            label: "My Tasks",
-          },
-          {
-            to: "/tree-detail",
-            icon: <FaTree size={18} />,
-            label: "Tree Detail",
-          },
-          {
-            to: "/groupMember",
-            icon: <MdPeople size={20} />,
-            label: "Group Members",
-          },
-        ];
+  let navItems = [];
+  if (userType === "superAdmin") {
+    navItems = [
+      {
+        to: "/admin-dashboard",
+        icon: <MdDashboard size={20} />,
+        label: "Dashboard",
+      },
+      {
+        to: "/donor-index",
+        icon: <FaTree size={18} />,
+        label: "Donations",
+      },
+      {
+        to: "/manage-user",
+        icon: <MdPeople size={20} />,
+        label: "Manage User",
+      },
+      {
+        to: "/manage-plantation/assignments",
+        icon: <MdAssignment size={20} />,
+        label: "Tree Assignments",
+      },
+      {
+        to: "/tree-detail",
+        icon: <FaTree size={18} />,
+        label: "Tree Detail",
+      },
+      { to: "/master", icon: <MdSettings size={20} />, label: "Master" },
+    ];
+  } else if (userType === "donor") {
+    navItems = [
+      {
+        to: "/donor-dashboard",
+        icon: <MdDashboard size={20} />,
+        label: "Dashboard",
+      },
+      {
+        to: "/donor-index",
+        icon: <FaTree size={18} />,
+        label: "My Donations",
+      },
+    ];
+  } else {
+    navItems = [
+      {
+        to: "/admin-dashboard",
+        icon: <MdDashboard size={20} />,
+        label: "Dashboard",
+      },
+      {
+        to: "/view-task",
+        icon: <MdAssignment size={20} />,
+        label: "My Tasks",
+      },
+      {
+        to: "/tree-detail",
+        icon: <FaTree size={18} />,
+        label: "Tree Detail",
+      },
+      {
+        to: "/groupMember",
+        icon: <MdPeople size={20} />,
+        label: "Group Members",
+      },
+    ];
+  }
 
   return (
     <aside
