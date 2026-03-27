@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { validateForm as validateFormUtils } from "../../../utils/formUtils";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../../utils/axiosInstance";
 import { toastSuccess, toastError } from "../../../utils/alertHelper";
 import CommonForm from "../../../components/common-components/CommonForm";
 
 const CreateAssignment = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  // Get donationId from query param if present
+  const donationId = React.useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get("donationId") || null;
+  }, [location.search]);
   const [formData, setFormData] = useState({
     treeName: "",
     count: "",
@@ -280,11 +286,13 @@ const CreateAssignment = () => {
         group: assignedGroupId,
       };
 
-      console.log(" Assignment Payload:", payload);
-      console.log(" All form data:", formData);
-      console.log(" Group Info:", groupInfo);
-
-      const res = await axiosInstance.post("/assign", payload);
+      let res;
+      if (donationId) {
+        // Assign to a specific donation
+        res = await axiosInstance.post(`/donations/${donationId}/assign`, payload);
+      } else {
+        res = await axiosInstance.post("/assign", payload);
+      }
 
       if (res.data.Status === 2) {
         // Multiple groups found
@@ -296,7 +304,11 @@ const CreateAssignment = () => {
 
       if (res.data.Status === 1) {
         toastSuccess(res.data.Message || "Tree assigned successfully");
-        navigate("/manage-plantation/assignments");
+        if (donationId) {
+          navigate("/donations", { state: { updated: true } });
+        } else {
+          navigate("/manage-plantation/assignments");
+        }
       } else {
         toastError(res.data.Message || "Failed to assign tree");
       }

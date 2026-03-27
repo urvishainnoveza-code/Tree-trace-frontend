@@ -510,6 +510,7 @@ const UserIndex = () => {
       formDataToSend.append("houseNo", formData.houseNo);
       formDataToSend.append("societyName", formData.societyName);
       formDataToSend.append("landmark", formData.landmark);
+      
       if (formData.profilePhoto) {
         formDataToSend.append("profilePhoto", formData.profilePhoto);
       }
@@ -770,6 +771,7 @@ const UserIndex = () => {
                 { label: "State", key: "state.name" },
                 { label: "City", key: "city.name" },
                 { label: "Area", key: "area.name" },
+                {label: "Role", key: "role.name"},
                 {
                   label: "Status",
                   key: "isActive",

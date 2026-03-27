@@ -11,9 +11,14 @@ export const setAuth = (token, user) => {
   localStorage.setItem("token", token);
   localStorage.setItem("user", JSON.stringify(user));
 
-  //Store userType for ProtectedRoute
+  // Store userType for ProtectedRoute
   if (user && user.role && user.role.name) {
-    localStorage.setItem("userType", user.role.name);
+    // If userType is donor, set as 'donor', else use role name
+    if (user.userType === "donor") {
+      localStorage.setItem("userType", "donor");
+    } else {
+      localStorage.setItem("userType", user.role.name);
+    }
   }
 };
 
