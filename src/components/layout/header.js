@@ -45,7 +45,10 @@ const Header = ({ onSidebarToggle }) => {
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
-      if (notificationRef.current && !notificationRef.current.contains(event.target))
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      )
         setShowNotification(false);
       if (profileRef.current && !profileRef.current.contains(event.target))
         setShowProfileMenu(false);
@@ -85,15 +88,30 @@ const Header = ({ onSidebarToggle }) => {
   return (
     <header className="header">
       {/* ✅ Hamburger — visible on MOBILE only (CSS hides on desktop) */}
-      <button className="hamburger-btn" onClick={onSidebarToggle} aria-label="Toggle sidebar">
+      <button
+        className="hamburger-btn"
+        onClick={onSidebarToggle}
+        aria-label="Toggle sidebar"
+      >
         <FaBars size={20} />
       </button>
 
       <div className="header-actions">
+        {userType === "donor" && (
+          <button
+            className="btn btn-primary user-filter-btn common-index-font14"
+            onClick={() => navigate("/donate-tree")}
+          >
+            + Donate Tree
+          </button>
+        )}
         {userType === "user" && (
           <div className="notification-wrapper" ref={notificationRef}>
-            <FaBell size={22} style={{ cursor: "pointer" }}
-              onClick={() => setShowNotification((prev) => !prev)} />
+            <FaBell
+              size={22}
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowNotification((prev) => !prev)}
+            />
             {unreadCount > 0 && (
               <span className="notification-badge">{unreadCount}</span>
             )}
@@ -102,7 +120,10 @@ const Header = ({ onSidebarToggle }) => {
                 <div className="notification-dropdown-header">
                   <span>Notifications</span>
                   {unreadCount > 0 && (
-                    <button className="mark-all-read-btn" onClick={markAllAsRead}>
+                    <button
+                      className="mark-all-read-btn"
+                      onClick={markAllAsRead}
+                    >
                       Mark all as read
                     </button>
                   )}
@@ -111,9 +132,11 @@ const Header = ({ onSidebarToggle }) => {
                   <p className="notification-empty">No notifications</p>
                 )}
                 {notifications.map((n) => (
-                  <div key={n._id}
+                  <div
+                    key={n._id}
                     className={`notification-item ${n.isRead ? "read" : "unread"}`}
-                    onClick={() => markAsRead(n._id)}>
+                    onClick={() => markAsRead(n._id)}
+                  >
                     <p>{n.message}</p>
                     <small>{new Date(n.createdAt).toLocaleString()}</small>
                   </div>
@@ -124,7 +147,10 @@ const Header = ({ onSidebarToggle }) => {
         )}
 
         <div className="profile-wrapper" ref={profileRef}>
-          <div className="profile-btn" onClick={() => setShowProfileMenu((prev) => !prev)}>
+          <div
+            className="profile-btn"
+            onClick={() => setShowProfileMenu((prev) => !prev)}
+          >
             {profilePhoto ? (
               <img src={profilePhoto} alt="profile" className="profile-img" />
             ) : (

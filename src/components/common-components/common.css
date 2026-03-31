@@ -791,7 +791,7 @@ body {
   border-radius: 12px 12px 12px  12px;
   background: #fff;
   overflow: hidden;
-  border: 1px solid #e0e0e0;
+ /*border: 1px solid #e0e0e0;*/
   border-collapse: separate;
   border-spacing: 0;
   margin-bottom: 0;
@@ -1146,7 +1146,7 @@ select:invalid {
 
 .select2-container--default .select2-selection--single:focus,
 .select2-container--default .select2-selection--single.select2-selection--focus {
-  border-color: #b1b4a8;
+  border-color: #eee;
   outline: 0;
 }
 
@@ -1167,7 +1167,7 @@ select:invalid {
 /* Custom ERP Dropdown */
 .customDropDown .select2-container--default .select2-selection--single {
   height: 44.5px;
-  border: 1px solid #dee2e6;
+  border: 1px solid #e0e0e0;
   outline: none;
   background-color: #fff;
   border-radius: 50px !important;
@@ -1841,7 +1841,7 @@ select:invalid {
   gap: 8px;
   font-family: var(--font-head);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-dark);
 }
 
@@ -1857,7 +1857,7 @@ select:invalid {
 
 .ud-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  background: linear-gradient(90deg, transparent, transparent);
   margin: 20px 0;
 }
 
@@ -2210,16 +2210,16 @@ select:invalid {
   position: relative;
 }
 
-.ud-ti-healthy  { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
-.ud-ti-needcare { background: linear-gradient(135deg, #fef9c3, #fde68a); }
-.ud-ti-dead     { background: linear-gradient(135deg, #fee2e2, #fecaca); }
+.ud-ti-healthy  { background: #e5ffd75e; }
+.ud-ti-needcare{background:  #ccd0101a; }
+.ud-ti-dead     { background: #ff00000d; }
 
 .ud-htag {
   position: absolute;
   bottom: 8px;
   right: 8px;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 500;
   padding: 3px 10px;
   border-radius: 999px;
 }
@@ -2231,9 +2231,7 @@ select:invalid {
 .ud-tree-body { padding: 14px; }
 
 .ud-tree-name {
-  font-family: var(--font-head);
-  font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-dark);
   margin-bottom: 2px;
   white-space: nowrap;
@@ -3058,9 +3056,6 @@ select:invalid {
   margin-right: 4px;
 }
 
-/* ================================================================
-   ADMIN INFO
-   ================================================================ */
 .profile-admin {
   border: 1px solid #e3e6f0;
   border-radius: 10px;
@@ -3139,4 +3134,14 @@ select:invalid {
   
   }
   .profile-info { width: 100%; }
+}
+.form-check {
+  height: 2em;
+  margin-top: 0px;
+  width: 40px;
+}
+.form-check-input:checked {
+  background-color: #198754;
+  border-color: #2e7d32;
+  box-shadow: none;
 }
