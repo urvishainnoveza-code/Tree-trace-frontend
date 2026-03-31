@@ -14,6 +14,7 @@ import {
 } from "../../../utils/alertHelper";
 
 const initialFormData = {
+  userType: "user", // default to user
   firstName: "",
   lastName: "",
   email: "",
@@ -510,7 +511,7 @@ const UserIndex = () => {
       formDataToSend.append("houseNo", formData.houseNo);
       formDataToSend.append("societyName", formData.societyName);
       formDataToSend.append("landmark", formData.landmark);
-      
+
       if (formData.profilePhoto) {
         formDataToSend.append("profilePhoto", formData.profilePhoto);
       }
@@ -521,7 +522,7 @@ const UserIndex = () => {
       }
 
       if (mode === "add") {
-        formDataToSend.append("userType", "user");
+        formDataToSend.append("userType", formData.userType || "user");
         const res = await axiosInstance.post("/users", formDataToSend);
         const responsePayload = res.data || {};
         if ((responsePayload.Status ?? responsePayload.status) === 1) {
@@ -557,6 +558,18 @@ const UserIndex = () => {
   // Update form fields when dependencies change
   useEffect(() => {
     setFormFields([
+      {
+        name: "userType",
+        label: "Register As",
+        type: "select",
+        required: true,
+        options: [
+          { value: "user", label: "User (Field Staff)" },
+          { value: "donor", label: "Donor" },
+        ],
+        colClass: "col-md-6",
+        disabled: mode === "edit", // Only allow changing on add
+      },
       {
         name: "firstName",
         label: "First Name",
@@ -771,7 +784,7 @@ const UserIndex = () => {
                 { label: "State", key: "state.name" },
                 { label: "City", key: "city.name" },
                 { label: "Area", key: "area.name" },
-                {label: "Role", key: "role.name"},
+                { label: "Role", key: "role.name" },
                 {
                   label: "Status",
                   key: "isActive",

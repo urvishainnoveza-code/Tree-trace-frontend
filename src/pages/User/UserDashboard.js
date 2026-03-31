@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import axiosInstance from "../../utils/axiosInstance";
 import "../../components/common-components/common.css";
+import treeDefaultImg from "../../assets/tree.jpg";
 
 const PIE_COLOR_MAP = {
   Healthy: "#16a34a",
@@ -21,34 +22,19 @@ const getHealthConfig = (h) => {
   if (s === "healthy")
     return {
       cls: "ud-ht-h",
-      label: "✦ Healthy",
+      label: "Healthy",
       imgCls: "ud-ti-healthy",
-      Svg: () => (
-        <span role="img" aria-label="Healthy">
-          🌳
-        </span>
-      ),
     };
   if (s === "dead")
     return {
       cls: "ud-ht-d",
-      label: "✕ Dead",
+      label: "Dead",
       imgCls: "ud-ti-dead",
-      Svg: () => (
-        <span role="img" aria-label="Dead">
-          🪦
-        </span>
-      ),
     };
   return {
     cls: "ud-ht-n",
-    label: "⚠ Needs Care",
+    label: "Needs Care",
     imgCls: "ud-ti-needcare",
-    Svg: () => (
-      <span role="img" aria-label="Needs Care">
-        🌱
-      </span>
-    ),
   };
 };
 
@@ -247,7 +233,7 @@ function UserDashboard() {
 
             <div className="row g-3 mb-2">
               {topTrees.map((tree, ti) => {
-                const { cls, label, imgCls, Svg } = getHealthConfig(
+                const { cls, label, imgCls } = getHealthConfig(
                   tree.healthStatus,
                 );
                 const treeName = tree.treeName
@@ -269,15 +255,30 @@ function UserDashboard() {
                               objectFit: "cover",
                               borderRadius: 8,
                             }}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = treeDefaultImg;
+                            }}
                           />
                         ) : (
-                          <Svg />
+                          <img
+                            src={treeDefaultImg}
+                            alt={treeName}
+                            style={{
+                              width: 100,
+                              height: 100,
+                              objectFit: "cover",
+                              borderRadius: 8,
+                            }}
+                          />
                         )}
                         <div className={`ud-htag ${cls}`}>{label}</div>
                       </div>
                       <div className="ud-tree-body">
-                        <div className="ud-tree-name">{treeName}</div>
-                        <div className="ud-tree-meta">
+                        <div className="ud-tree-name common-index-font14">
+                          {treeName}
+                        </div>
+                        <div className="ud-tree-meta comon-index-font14">
                           <div className="ud-tm-row">
                             Planted:&nbsp;
                             {tree.plantationDate

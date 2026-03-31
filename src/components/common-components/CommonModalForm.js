@@ -133,7 +133,7 @@ const CommonModalForm = ({
                           )}
 
                           {field.type === "checkbox" && (
-                            <div className="form-check mt-2">
+                            <div className="form-check">
                               <input
                                 type="checkbox"
                                 className={fieldError ? "is-invalid" : ""}
@@ -347,12 +347,12 @@ const CommonModalForm = ({
                             handleFieldChange(field.name, e.target.checked)
                           }
                         />
-                        <label
+                                {/*  <label
                           className="form-check-label"
                           htmlFor={field.name}
                         >
                           {field.placeholder || field.label}
-                        </label>
+                        </label>*/}
                       </div>
                     ) : (
                       <input

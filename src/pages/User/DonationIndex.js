@@ -78,6 +78,11 @@ export default function DonorIndex() {
       render: (row) => row.quantity,
     },
     {
+      key: "cage",
+      label: "Cage",
+      render: (row) => (row.cage ? "Yes" : "No"),
+    },
+    {
       key: "amount",
       label: "Amount",
       render: (row) => row.amount,
@@ -116,11 +121,7 @@ export default function DonorIndex() {
           <button
             className="btn btn-primary common-index-font14"
             style={{
-              padding: "2px 12px",
-              fontSize: 13,
-              borderRadius: 4,
-              marginLeft: 4,
-              opacity: row.status === "pending" ? 1 : 0.5,
+             
               pointerEvents: row.status === "pending" ? "auto" : "none",
             }}
             onClick={() =>
@@ -146,9 +147,9 @@ export default function DonorIndex() {
       className="container"
       style={{ maxWidth: 1100, margin: "0 auto", padding: 24 }}
     >
-      <h2 style={{ marginBottom: 24 }}>
+      <h4 className="commonindex-24">
         {roleName === "superAdmin" ? "All Donations" : "My Donations"}
-      </h2>
+      </h4>
       {loading ? (
         <div>Loading donations...</div>
       ) : error ? (
