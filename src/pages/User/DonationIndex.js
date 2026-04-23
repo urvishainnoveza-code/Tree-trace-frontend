@@ -121,12 +121,18 @@ export default function DonorIndex() {
           <button
             className="btn btn-primary common-index-font14"
             style={{
-             
               pointerEvents: row.status === "pending" ? "auto" : "none",
             }}
             onClick={() =>
               row.status === "pending"
-                ? navigate(`/manage-plantation/assign?donationId=${row._id}`)
+                ? navigate(
+                    `/manage-plantation/assign?donationId=${row._id}&count=${row.quantity}`,
+                    {
+                      state: {
+                        donationCount: row.quantity,
+                      },
+                    },
+                  )
                 : undefined
             }
             disabled={row.status !== "pending"}
