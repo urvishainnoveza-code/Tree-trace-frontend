@@ -8,7 +8,7 @@ import {
   MdAssignment,
   MdSettings,
 } from "react-icons/md";
-import { FaTree } from "react-icons/fa";
+import { FaTree, FaDonate } from "react-icons/fa";
 
 const Sidebar = ({ open, onToggle }) => {
   const userType = localStorage.getItem("userType");
@@ -25,7 +25,7 @@ const Sidebar = ({ open, onToggle }) => {
       },
       {
         to: "/donor-index",
-        icon: <FaTree size={18} />,
+        icon: <FaDonate size={18} />,
         label: "Donations",
       },
       {
@@ -54,7 +54,7 @@ const Sidebar = ({ open, onToggle }) => {
       },
       {
         to: "/donor-index",
-        icon: <FaTree size={18} />,
+        icon: <FaDonate size={18} />,
         label: "My Donations",
       },
     ];

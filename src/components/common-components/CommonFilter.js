@@ -4,7 +4,6 @@ import "select2/dist/css/select2.min.css";
 import "select2";
 import "./common.css";
 
-
 const CommonFilter = ({
   filters = {},
   dropdowns = {},
@@ -154,7 +153,7 @@ const CommonFilter = ({
           {key === "date" ? (
             <input
               type="date"
-              className="form-control user-search-input common-index-font14"
+              className="form-control user-search-input common-filter-date common-index-font14"
               value={selectedFilters[key]}
               onChange={(e) => handleChange(key, e.target.value)}
             />

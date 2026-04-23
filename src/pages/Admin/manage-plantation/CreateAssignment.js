@@ -13,9 +13,16 @@ const CreateAssignment = () => {
     const params = new URLSearchParams(location.search);
     return params.get("donationId") || null;
   }, [location.search]);
+  const donationCount = React.useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    const queryCount = params.get("count");
+    const stateCount = location.state?.donationCount;
+
+    return queryCount || stateCount || "";
+  }, [location.search, location.state]);
   const [formData, setFormData] = useState({
     treeName: "",
-    count: "",
+    count: donationCount ? String(donationCount) : "",
     country: "",
     state: "",
     city: "",
@@ -36,6 +43,15 @@ const CreateAssignment = () => {
   const [multipleGroups, setMultipleGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState("");
   const [showGroupModal, setShowGroupModal] = useState(false);
+
+  useEffect(() => {
+    if (donationCount) {
+      setFormData((prev) => ({
+        ...prev,
+        count: String(donationCount),
+      }));
+    }
+  }, [donationCount]);
 
   useEffect(() => {
     fetchCountries();
@@ -289,7 +305,10 @@ const CreateAssignment = () => {
       let res;
       if (donationId) {
         // Assign to a specific donation
-        res = await axiosInstance.post(`/donations/${donationId}/assign`, payload);
+        res = await axiosInstance.post(
+          `/donations/${donationId}/assign`,
+          payload,
+        );
       } else {
         res = await axiosInstance.post("/assign", payload);
       }
@@ -422,6 +441,13 @@ const CreateAssignment = () => {
         </div>
 
         <div className="card-body">
+          {donationId && donationCount && (
+            <div className="alert alert-info mb-3">
+              <strong>Donation linked:</strong> tree count loaded from the
+              donated quantity. You can edit it before assigning.
+            </div>
+          )}
+
           {groupInfo && (
             <div className="alert alert-success mb-3">
               <strong>✓ Group Found:</strong> {groupInfo.name} (

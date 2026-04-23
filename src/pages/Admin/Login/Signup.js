@@ -110,7 +110,7 @@ function Signup() {
   };
 
   return (
-    <div className="auth-container">
+    <div className="auth-container auth-container-signup">
       <div className="auth-left">
         <div className="illustration-overlay">
           <div className="left-inner-card">
@@ -119,7 +119,7 @@ function Signup() {
         </div>
       </div>
 
-      <div className="auth-card">
+      <div className="auth-card auth-card-signup">
         <div className="auth-header">
           <div className="pill-toggle">
             <button onClick={() => navigate("/")}>Sign In</button>
@@ -130,7 +130,7 @@ function Signup() {
           <p className="auth-subtitle">Create your account</p>
         </div>
 
-        <div className="auth-body">
+        <div className="auth-body auth-body-signup">
           <form onSubmit={handleSubmit}>
             <div className="auth-grid-2">
               <div className="auth-form-group">
